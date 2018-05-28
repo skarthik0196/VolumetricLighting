@@ -15,10 +15,10 @@ namespace Rendering
 		LoadModel(device, filename, flipUVs);
 	}
 
-	//bool Model::HasMaterials() const
-	//{
-	//	return (Materials.size() > 0);
-	//}
+	bool Model::HasMaterials() const
+	{
+		return (Materials.size() > 0);
+	}
 
 	bool Model::HasMeshes() const
 	{
@@ -30,17 +30,17 @@ namespace Rendering
 		return Meshes;
 	}
 
-	//const std::vector<std::shared_ptr<Material>>& Model::GetMaterials()
-	//{
-	//	return Materials;
-	//}
+	const std::vector<std::shared_ptr<Material>>& Model::GetMaterials()
+	{
+		return Materials;
+	}
 
-	//Material & Model::CreateMaterial()
-	//{
-	//	std::shared_ptr<Material> newMaterial = std::make_shared<Material>(*this);
-	//	Materials.push_back(newMaterial);
-	//	return *newMaterial;
-	//}
+	Material& Model::CreateMaterial()
+	{
+		std::shared_ptr<Material> newMaterial = std::make_shared<Material>(*this);
+		Materials.push_back(newMaterial);
+		return *newMaterial;
+	}
 
 	void Model::LoadModel(ID3D11Device2* device, const std::string& fileName, bool flipUVs)
 	{
@@ -64,19 +64,19 @@ namespace Rendering
 			throw std::exception("Invalid File");
 		}
 
-		//if (scene->HasMaterials())
-		//{
-		//	for (uint32_t i = 0; i < scene->mNumMaterials; i++)
-		//	{
-		//		Materials.push_back(std::make_shared<Material>(Material(*this, scene->mMaterials[i], device)));
-		//	}
-		//}
+		if (scene->HasMaterials())
+		{
+			for (uint32_t i = 0; i < scene->mNumMaterials; i++)
+			{
+				Materials.push_back(std::make_shared<Material>(*this, scene->mMaterials[i], device, fileName));
+			}
+		}
 
 		if (scene->HasMeshes())
 		{
 			for (uint32_t i = 0; i < scene->mNumMeshes; i++)
 			{
-				Meshes.push_back(std::make_shared<Mesh>(*this, *(scene->mMeshes[i]), *(scene->mMaterials[scene->mMeshes[i]->mMaterialIndex]), device));
+				Meshes.push_back(std::make_shared<Mesh>(*this, *(scene->mMeshes[i]), scene->mMeshes[i]->mMaterialIndex, device));
 			}
 		}
 	}

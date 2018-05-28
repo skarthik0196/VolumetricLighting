@@ -50,7 +50,7 @@ namespace Rendering
 		depthStencilBufferDescription.Height = static_cast<uint32_t>(ScreenHeight);
 		depthStencilBufferDescription.MipLevels = MipLevels;
 		depthStencilBufferDescription.ArraySize = 1;
-		depthStencilBufferDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilBufferDescription.Format = DXGI_FORMAT_D32_FLOAT;
 		depthStencilBufferDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		depthStencilBufferDescription.Usage = D3D11_USAGE_DEFAULT;
 		depthStencilBufferDescription.SampleDesc.Count = 1;
@@ -59,7 +59,7 @@ namespace Rendering
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescription;
 		ZeroMemory(&depthStencilViewDescription, sizeof(depthStencilViewDescription));
 
-		depthStencilViewDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilViewDescription.Format = DXGI_FORMAT_D32_FLOAT;
 		depthStencilViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
 		depthStencilViewDescription.Flags = 0;
 		depthStencilViewDescription.Texture2D.MipSlice = 0;
@@ -72,8 +72,10 @@ namespace Rendering
 		depthStencilDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		depthStencilDescription.DepthFunc = D3D11_COMPARISON_LESS;
 
-		depthStencilDescription.StencilEnable = true;
-		depthStencilDescription.StencilReadMask = 0xFF;
+		//Enable Stencil if required, remember to change format to D24_U8
+
+		depthStencilDescription.StencilEnable = false;
+		/*depthStencilDescription.StencilReadMask = 0xFF;
 		depthStencilDescription.StencilWriteMask = 0xFF;
 
 		depthStencilDescription.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
@@ -84,7 +86,7 @@ namespace Rendering
 		depthStencilDescription.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 		depthStencilDescription.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 		depthStencilDescription.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDescription.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		depthStencilDescription.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;*/
 
 		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthStencilState.GetAddressOf());
 		result = Device->CreateDepthStencilView(DepthBuffer.Get(), &depthStencilViewDescription, DepthStencilView.GetAddressOf());
@@ -105,6 +107,8 @@ namespace Rendering
 		viewPortDescription.TopLeftY = 0;
 		viewPortDescription.Width = static_cast<float>(ScreenWidth);
 		viewPortDescription.Height = static_cast<float>(ScreenHeight);
+		viewPortDescription.MinDepth = 0;
+		viewPortDescription.MaxDepth = 1;
 
 		DeviceContext->RSSetViewports(1, &viewPortDescription);
 	}

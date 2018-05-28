@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "GameObject.h"
+#include "InputManager.h"
 
 namespace Rendering
 {
@@ -24,10 +25,12 @@ namespace Rendering
 		void DrawCurrentScene();
 
 		std::shared_ptr<Direct3D>& GetRenderer();
+		std::shared_ptr<InputManager>& GetInputManager();
 
 	private:
 
 		std::shared_ptr<Direct3D> Direct3DRenderer;
+		std::shared_ptr<InputManager> Input;
 		std::vector<std::shared_ptr<Scene>> SceneList;
 		uint32_t CurrentSceneIndex;
 	};

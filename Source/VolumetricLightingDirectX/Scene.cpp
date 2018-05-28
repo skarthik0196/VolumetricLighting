@@ -77,8 +77,11 @@ namespace Rendering
 	void Scene::UpdateScene()
 	{
 		//auto currentPosition = MainCamera->GetPositionAsFloat3();
-		//currentPosition.x += 0.1f;
+		//currentPosition.z += 1.0f;
 		//MainCamera->SetPosition(currentPosition);
+		HandleInput();
+
+		MainCamera->Rotate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), 1);
 
 		for (auto& gameObject : GameObjectList)
 		{
@@ -86,10 +89,50 @@ namespace Rendering
 		}
 	}
 
+	void Scene::HandleInput()
+	{
+		static const float speed = 5.0f;
+		const std::map<InputManager::InputActions, bool>& inputMap = SceneManagerReference.GetInputManager()->GetInput();
+
+		auto currentPosition = MainCamera->GetPositionAsFloat3();
+		if (inputMap.at(InputManager::InputActions::Forward))
+		{
+			currentPosition.z -= speed;
+		}
+
+		if (inputMap.at(InputManager::InputActions::Backward))
+		{
+			currentPosition.z += speed;
+		}
+
+		if (inputMap.at(InputManager::InputActions::StrafeLeft))
+		{
+			currentPosition.x -= speed;
+		}
+
+		if (inputMap.at(InputManager::InputActions::StrafeRight))
+		{
+			currentPosition.x += speed;
+		}
+
+		if (inputMap.at(InputManager::InputActions::Up))
+		{
+			currentPosition.y += speed;
+		}
+
+		if (inputMap.at(InputManager::InputActions::Down))
+		{
+			currentPosition.y -= speed;
+		}
+
+		MainCamera->SetPosition(currentPosition);
+	}
+
 	void Scene::DrawScene(std::shared_ptr<Direct3D> direct3DRenderer)
 	{
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->VSSetShader(DefaultVertexShader->GetVertexShader(), 0, 0);
 		deviceContext->PSSetShader(DefaultPixelShader->GetPixelShader(), 0, 0);
 		deviceContext->IASetInputLayout(DefaultVertexShader->GetInputLayout());

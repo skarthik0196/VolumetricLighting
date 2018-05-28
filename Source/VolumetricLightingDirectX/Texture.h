@@ -24,7 +24,8 @@ namespace Rendering
 		enum class TextureFileType
 		{
 			DDS,
-			WIC
+			WIC,
+			TGA
 		};
 
 		Texture(const std::wstring& filePath, TextureFileType fileType = TextureFileType::WIC, TextureType textureType = TextureType::Diffuse);

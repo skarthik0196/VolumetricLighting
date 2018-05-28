@@ -138,7 +138,7 @@ namespace Rendering
 		DirectX::XMMATRIX worldMatrix;
 		worldMatrix = DirectX::XMLoadFloat4x4(&Utility::IdentityMatrix) * DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&ObjectTransform.Scale))
 					* DirectX::XMMatrixRotationRollPitchYaw(ObjectTransform.Rotation.x, ObjectTransform.Rotation.y, ObjectTransform.Rotation.z) 
-					* DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&ObjectTransform.Position));
+					* DirectX::XMMatrixTranslation(ObjectTransform.Position.x, ObjectTransform.Position.y, ObjectTransform.Position.z);
 
 		DirectX::XMStoreFloat4x4(&WorldMatrix, worldMatrix);
 

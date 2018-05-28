@@ -6,7 +6,7 @@
 
 namespace Rendering
 {
-	Mesh::Mesh(Model& model, aiMesh& mesh, aiMaterial& material, ID3D11Device2* D3Ddevice) : ReferenceToModel(model), MeshMaterial(std::make_shared<Material>(&material, D3Ddevice)), FaceCount(0), Name(mesh.mName.C_Str())
+	Mesh::Mesh(Model& model, aiMesh& mesh, uint32_t materialIndex, ID3D11Device2* D3Ddevice) : ReferenceToModel(model), FaceCount(0), Name(mesh.mName.C_Str()), MaterialIndex(materialIndex)
 	{
 		Vertices.reserve(mesh.mNumVertices);
 		for (uint32_t i = 0; i < mesh.mNumVertices; ++i)
@@ -198,7 +198,7 @@ namespace Rendering
 
 	std::shared_ptr<Material> Mesh::GetMaterial() const
 	{
-		return MeshMaterial;
+		return ReferenceToModel.GetMaterials()[MaterialIndex];
 	}
 
 	Vertex::Vertex(const DirectX::XMFLOAT4& position, const DirectX::XMFLOAT2& textureCoordinates, const DirectX::XMFLOAT3& normals) :Position(position), TextureCoordinates(textureCoordinates), Normals(normals)

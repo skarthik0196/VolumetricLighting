@@ -35,6 +35,8 @@ namespace Rendering
 		std::vector<std::shared_ptr<GameObject>>& GetGameObjectList();
 
 	private:
+		void HandleInput();
+
 		std::vector<std::shared_ptr<GameObject>> GameObjectList;
 
 		std::shared_ptr<Camera> MainCamera;

@@ -25,7 +25,7 @@ namespace Rendering
 
 		friend class Model;
 
-		Mesh(Model& model, aiMesh& mesh, aiMaterial& material, ID3D11Device2* D3Ddevice);
+		Mesh(Model& model, aiMesh& mesh, uint32_t materialIndex, ID3D11Device2* D3Ddevice);
 		virtual ~Mesh() = default;
 
 		Model& GetModel();
@@ -54,12 +54,13 @@ namespace Rendering
 
 		std::shared_ptr<Material> GetMaterial() const;
 
+
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> IndexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> VertexBuffer;
 
 		Model& ReferenceToModel;
-		std::shared_ptr<Material> MeshMaterial{ nullptr };
 
 		std::string Name;
 		std::vector<DirectX::XMFLOAT3> Vertices;
@@ -70,5 +71,7 @@ namespace Rendering
 		std::vector<std::shared_ptr<std::vector<DirectX::XMFLOAT4>>> VertexColors;
 		uint32_t FaceCount;
 		std::vector<uint32_t> Indices;
+
+		std::uint32_t MaterialIndex;
 	};
 }

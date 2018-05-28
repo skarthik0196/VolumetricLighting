@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
+#include <DirectXTex.h>
 
 namespace Rendering
 {
@@ -51,13 +52,32 @@ namespace Rendering
 
 	void Texture::InitializeTexture(ID3D11Device2* device)
 	{
-		if (FileType == TextureFileType::DDS)
+
+		switch (FileType)
 		{
-			DirectX::CreateDDSTextureFromFile(device, FilePath.c_str(), nullptr, ShaderResourceView.GetAddressOf());
-		}
-		else
-		{
-			DirectX::CreateWICTextureFromFile(device, FilePath.c_str(), nullptr, ShaderResourceView.GetAddressOf());
+			case TextureFileType::DDS:
+			{
+				DirectX::CreateDDSTextureFromFile(device, FilePath.c_str(), nullptr, ShaderResourceView.GetAddressOf());
+				break;
+			}
+			case TextureFileType::WIC:
+			{
+				DirectX::CreateWICTextureFromFile(device, FilePath.c_str(), nullptr, ShaderResourceView.GetAddressOf());
+				break;
+			}
+			case TextureFileType::TGA:
+			{
+				auto image = std::make_unique<DirectX::ScratchImage>();
+				HRESULT hr = LoadFromTGAFile(FilePath.c_str(), nullptr, *image);
+				if (FAILED(hr))
+				{
+					throw std::runtime_error("Texture Error");
+				}
+
+				DirectX::CreateShaderResourceView(device, image->GetImages(), image->GetImageCount(), image->GetMetadata(), ShaderResourceView.GetAddressOf());
+				image->Release();
+				break;
+			}
 		}
 	}
 }

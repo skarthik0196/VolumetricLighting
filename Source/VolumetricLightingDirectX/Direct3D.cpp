@@ -65,9 +65,33 @@ namespace Rendering
 		depthStencilViewDescription.Texture2D.MipSlice = 0;
 
 		result = Device->CreateTexture2D(&depthStencilBufferDescription, nullptr, DepthBuffer.GetAddressOf());
+
+		D3D11_DEPTH_STENCIL_DESC depthStencilDescription;
+
+		depthStencilDescription.DepthEnable = true;
+		depthStencilDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		depthStencilDescription.DepthFunc = D3D11_COMPARISON_LESS;
+
+		depthStencilDescription.StencilEnable = true;
+		depthStencilDescription.StencilReadMask = 0xFF;
+		depthStencilDescription.StencilWriteMask = 0xFF;
+
+		depthStencilDescription.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDescription.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		depthStencilDescription.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDescription.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		depthStencilDescription.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDescription.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		depthStencilDescription.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDescription.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthStencilState.GetAddressOf());
 		result = Device->CreateDepthStencilView(DepthBuffer.Get(), &depthStencilViewDescription, DepthStencilView.GetAddressOf());
 
 		result = GetDevice()->CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf());
+
+		SetDepthDepthStencilState();
 		SetSingleRenderTarget();
 		CreateViewPort();
 	}
@@ -97,14 +121,7 @@ namespace Rendering
 
 	void Direct3D::RenderToScreen()
 	{
-		if (VSync)
-		{
-			SwapChain->Present(1, 0);
-		}
-		else
-		{
-			SwapChain->Present(0, 0);
-		}
+		SwapChain->Present(static_cast<uint32_t>(VSync), 0);
 	}
 
 	void Direct3D::SetVSync(bool vsyncStatus)
@@ -115,6 +132,11 @@ namespace Rendering
 	void Direct3D::SetSingleRenderTarget()
 	{
 		DeviceContext->OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), DepthStencilView.Get());
+	}
+
+	void Direct3D::SetDepthDepthStencilState()
+	{
+		DeviceContext->OMSetDepthStencilState(DepthStencilState.Get(), 1);
 	}
 
 	bool Direct3D::GetVSyncStatus()

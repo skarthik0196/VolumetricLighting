@@ -21,6 +21,7 @@ namespace Rendering
 
 		void SetVSync(bool vsyncStatus);
 		void SetSingleRenderTarget();
+		void SetDepthDepthStencilState();
 
 		bool GetVSyncStatus();
 
@@ -31,6 +32,7 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> BackBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> DepthBuffer;
 
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DepthStencilState;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 

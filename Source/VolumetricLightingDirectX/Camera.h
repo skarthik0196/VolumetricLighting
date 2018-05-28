@@ -65,7 +65,7 @@ namespace Rendering
 		DirectX::XMFLOAT4X4 ProjectionMatrix;
 		DirectX::XMFLOAT4X4 ViewProjectionMatrix;
 
-		float Angle;
+		float FieldOfView;
 		float NearPlane;
 		float FarPlane;
 		float ScreenWidth;

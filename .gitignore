@@ -80,3 +80,17 @@ Source/VolumetricLightingDirectX/Obj/Release/x64/VolumetricLightingDirectX.log
 Source/VolumetricLightingDirectX/Obj/Release/x64/VolumetricLightingDirectX.obj
 Source/VolumetricLightingDirectX/Obj/Release/x64/VolumetricLightingDirectX.pch
 Source/VolumetricLightingDirectX/Obj/Release/x64/VolumetricLightingDirectX.res
+Build/packages/
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Volumetr.F8CAC141.tlog/fxc.command.1.tlog
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Volumetr.F8CAC141.tlog/fxc.read.1.tlog
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Volumetr.F8CAC141.tlog/fxc.write.1.tlog
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Volumetr.F8CAC141.tlog/VolumetricLightingDirectX.write.1u.tlog
+Source/VolumetricLightingDirectX/Obj/Debug/x64/GameObject.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Material.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Mesh.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Model.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Scene.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/SceneManager.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Shader.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Texture.obj
+Source/VolumetricLightingDirectX/Obj/Debug/x64/Utility.obj

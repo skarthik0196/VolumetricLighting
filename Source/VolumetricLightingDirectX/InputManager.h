@@ -14,7 +14,8 @@ namespace Rendering
 			StrafeLeft,
 			StrafeRight,
 			Up,
-			Down
+			Down,
+			Reset
 		};
 
 		InputManager(HWND windowHandle);
@@ -23,12 +24,17 @@ namespace Rendering
 		void ProcessInput();
 
 		const std::map<InputActions, bool>& GetInput();
+		const DirectX::XMFLOAT3& GetMouseInput();
 
 	private:
 		std::shared_ptr<DirectX::Keyboard> KeyboardComponent;
 		std::shared_ptr<DirectX::Mouse> MouseComponent;
 
 		std::map<InputActions, bool> KeyPressMap;
+
+		DirectX::XMFLOAT3 MouseInput;
+
+		float Sensititivity{0.1f};
 	};
 
 }

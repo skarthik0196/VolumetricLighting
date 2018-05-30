@@ -14,7 +14,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 Position : SV_POSITION;
-	float4 WorldPosition : WORLDPOS;
+	float3 WorldPosition : WORLDPOS;
 	float2 TextureCoordinate : TEXTURECOORDINATE;
 	float3 Normal : NORMAL;
 };
@@ -24,7 +24,7 @@ VS_OUTPUT main(VS_INPUT IN)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	Output.Position = mul(IN.Position, WorldViewProjectionMatrix);
-	Output.WorldPosition = IN.Position;
+	Output.WorldPosition = IN.Position.xyz;
 	Output.TextureCoordinate = IN.TextureCoordinate;
 	Output.Normal = IN.Normal;
 

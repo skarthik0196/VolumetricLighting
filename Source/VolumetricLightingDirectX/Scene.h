@@ -3,6 +3,7 @@
 #include "Direct3D.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "LightManager.h"
 
 namespace Rendering
 {
@@ -15,7 +16,7 @@ namespace Rendering
 		~Scene() = default;
 
 		void UpdateScene();
-		void DrawScene(std::shared_ptr<Direct3D> direct3DRenderer);
+		void DrawScene(std::shared_ptr<Direct3D>& direct3DRenderer);
 
 		void AddGameObject(std::shared_ptr<GameObject> gameObject);
 		void RemoveGameObject(std::shared_ptr<GameObject> gameObject);
@@ -24,22 +25,26 @@ namespace Rendering
 
 		void InitializeScene();
 
-		std::shared_ptr<Shader> GetDefaultVertexShader();
-		std::shared_ptr<Shader> GetDefaultPixelShader();
+		std::shared_ptr<Shader>& GetDefaultVertexShader();
+		std::shared_ptr<Shader>& GetDefaultPixelShader();
 
 		ID3D11Buffer* GetVSCBufferPerObject();
 		ID3D11Buffer* GetVSCBufferPerFrame();
 		ID3D11Buffer* GetPSCBufferPerObject();
 		ID3D11Buffer* GetPSCBufferPerFrame();
 
+		std::shared_ptr<Camera>& GetCamera();
+
 		std::vector<std::shared_ptr<GameObject>>& GetGameObjectList();
 
 	private:
 		void HandleInput();
 
+		SceneManager& SceneManagerReference;
 		std::vector<std::shared_ptr<GameObject>> GameObjectList;
-
+		
 		std::shared_ptr<Camera> MainCamera;
+		std::shared_ptr<LightManager> Lights;
 
 		std::shared_ptr<Shader> DefaultVertexShader;
 		std::shared_ptr<Shader> DefaultPixelShader;
@@ -51,7 +56,7 @@ namespace Rendering
 
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> DefaultSamplerState;
 
-		SceneManager& SceneManagerReference;
+
 	};
 }
 

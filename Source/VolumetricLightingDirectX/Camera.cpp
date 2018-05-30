@@ -4,7 +4,7 @@
 
 namespace Rendering
 {
-	Camera::Camera(float nearPlane, float farPlane) : NearPlane(nearPlane), FarPlane(farPlane), Position(Utility::Zero), Target(Utility::Forward), FieldOfView(1.0f), ScreenWidth(1024), ScreenHeight(768)
+	Camera::Camera(float nearPlane, float farPlane) : NearPlane(nearPlane), FarPlane(farPlane), Position(Utility::Zero), Target(Utility::Forward), RightVectorEndPoint(Utility::Right), Rotation(Utility::Zero), FieldOfView(1.0f), ScreenWidth(1024), ScreenHeight(768)
 	{
 		DirectX::XMFLOAT3 temp(Utility::Up);
 		DirectX::XMVECTOR upVector = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Position), DirectX::XMLoadFloat3(&temp));
@@ -38,6 +38,52 @@ namespace Rendering
 	const DirectX::XMFLOAT3& Camera::GetPositionAsFloat3() const
 	{
 		return Position;
+	}
+
+	DirectX::XMVECTOR Camera::GetRotation() const
+	{
+		return DirectX::XMLoadFloat3(&Rotation);
+	}
+
+	const DirectX::XMFLOAT3& Camera::GetRotationAsFloat3() const
+	{
+		return Rotation;
+	}
+
+	DirectX::XMVECTOR Camera::GetUpVectorN() const
+	{
+		return DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&UpVectorEndPoint), DirectX::XMLoadFloat3(&Position)));
+	}
+
+	DirectX::XMFLOAT3 Camera::GetUpVectorAsFloat3N() const
+	{
+		DirectX::XMFLOAT3 temp;
+		DirectX::XMStoreFloat3(&temp, GetUpVectorN());
+		return temp;
+	}
+
+	DirectX::XMVECTOR Camera::GetRightVectorN() const
+	{
+		return DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&RightVectorEndPoint), DirectX::XMLoadFloat3(&Position)));
+	}
+
+	DirectX::XMFLOAT3 Camera::GetRightVectorAsFloat3N() const
+	{
+		DirectX::XMFLOAT3 temp;
+		DirectX::XMStoreFloat3(&temp, GetRightVectorN());
+		return temp;
+	}
+
+	DirectX::XMVECTOR Camera::GetForwardVectorN() const
+	{
+		return DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&Target), DirectX::XMLoadFloat3(&Position)));
+	}
+
+	DirectX::XMFLOAT3 Camera::GetForwardVectorAsFloat3N() const
+	{
+		DirectX::XMFLOAT3 temp;
+		DirectX::XMStoreFloat3(&temp, GetForwardVectorN());
+		return temp;
 	}
 
 	void Camera::SetAngle(float angle)
@@ -153,6 +199,9 @@ namespace Rendering
 		temp = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&UpVectorEndPoint), DirectX::XMMatrixTranslation(DirectX::XMVectorGetX(translation), DirectX::XMVectorGetY(translation), DirectX::XMVectorGetZ(translation)));
 		DirectX::XMStoreFloat3(&UpVectorEndPoint, temp);
 
+		temp = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&RightVectorEndPoint), DirectX::XMMatrixTranslation(DirectX::XMVectorGetX(translation), DirectX::XMVectorGetY(translation), DirectX::XMVectorGetZ(translation)));
+		DirectX::XMStoreFloat3(&RightVectorEndPoint, temp);
+
 		InitializeViewMatrix();
 	}
 
@@ -169,14 +218,43 @@ namespace Rendering
 			return;
 		}
 
-		DirectX::XMVECTOR targetLookAt = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&Target), DirectX::XMLoadFloat3(&Position));
-		DirectX::XMVECTOR upVectorLookAt = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&UpVectorEndPoint), DirectX::XMLoadFloat3(&Position));
+		DirectX::XMStoreFloat3(&Rotation, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Rotation), DirectX::XMVectorScale(axis, angleInDegrees)));
 
-		targetLookAt = DirectX::XMVector3Transform(targetLookAt, DirectX::XMMatrixRotationAxis(axis, DirectX::XMConvertToRadians(angleInDegrees)));
-		upVectorLookAt = DirectX::XMVector3Transform(upVectorLookAt, DirectX::XMMatrixRotationAxis(axis, DirectX::XMConvertToRadians(angleInDegrees)));
+		//if (Rotation.y > 180.0f)
+		//{
+		//	Rotation.y = Rotation.y - 360.0f;
+		//}
+		//
+		//if (Rotation.y < -180.0f)
+		//{
+		//	Rotation.y = Rotation.y + 360.0f;
+		//}
 
-		DirectX::XMStoreFloat3(&Target, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Position), targetLookAt));
-		DirectX::XMStoreFloat3(&UpVectorEndPoint, DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Position), upVectorLookAt));
+		//if (Rotation.x > 180.0f)
+		//{
+		//	Rotation.x = Rotation.x - 360.0f;
+		//}
+
+		//if (Rotation.x < -180.0f)
+		//{
+		//	Rotation.x = Rotation.x + 360.0f;
+		//}
+
+		auto position = DirectX::XMLoadFloat3(&Position);
+
+		DirectX::XMVECTOR targetLookAt = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&Target), position);
+		DirectX::XMVECTOR upVectorLookAt = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&UpVectorEndPoint), position);
+		DirectX::XMVECTOR rightVectorLookAt = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&RightVectorEndPoint), position);
+
+		auto rotationMatrix = DirectX::XMMatrixRotationAxis(axis, DirectX::XMConvertToRadians(angleInDegrees));
+
+		targetLookAt = DirectX::XMVector3Transform(targetLookAt, rotationMatrix);
+		upVectorLookAt = DirectX::XMVector3Transform(upVectorLookAt, rotationMatrix);
+		rightVectorLookAt = DirectX::XMVector3Transform(rightVectorLookAt, rotationMatrix);
+
+		DirectX::XMStoreFloat3(&Target, DirectX::XMVectorAdd(position, targetLookAt));
+		DirectX::XMStoreFloat3(&UpVectorEndPoint, DirectX::XMVectorAdd(position, upVectorLookAt));
+		DirectX::XMStoreFloat3(&RightVectorEndPoint, DirectX::XMVectorAdd(position, rightVectorLookAt));
 
 		InitializeViewMatrix();
 	}
@@ -191,5 +269,34 @@ namespace Rendering
 	{
 		DirectX::XMVECTOR moveVector = DirectX::XMVectorSubtract(position, DirectX::XMLoadFloat3(&Position));
 		Move(moveVector);
+	}
+
+	void Camera::SetRotation(const DirectX::XMVECTOR& rotation)
+	{
+		DirectX::XMVECTOR requiredRotation = DirectX::XMVectorSubtract(rotation, DirectX::XMLoadFloat3(&Rotation));
+		Rotate(GetUpVectorAsFloat3N(), DirectX::XMVectorGetY(requiredRotation));
+		Rotate(GetRightVectorAsFloat3N(), DirectX::XMVectorGetX(requiredRotation));
+		Rotate(GetForwardVectorAsFloat3N(), DirectX::XMVectorGetZ(requiredRotation));
+	}
+
+	void Camera::SetRotation(const DirectX::XMFLOAT3& rotation)
+	{
+		DirectX::XMVECTOR requiredRotation = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&rotation), DirectX::XMLoadFloat3(&Rotation));
+		Rotate(GetUpVectorAsFloat3N(), DirectX::XMVectorGetY(requiredRotation));
+		Rotate(GetRightVectorAsFloat3N(), DirectX::XMVectorGetX(requiredRotation));
+		Rotate(GetForwardVectorAsFloat3N(), DirectX::XMVectorGetZ(requiredRotation));
+	}
+
+
+	void Camera::ResetCamera()
+	{
+		Position = Utility::Zero;
+		UpVectorEndPoint = Utility::Up;
+		RightVectorEndPoint = Utility::Right;
+		Target = Utility::Forward;
+
+		Rotation = Utility::Zero;
+
+		InitializeViewMatrix();
 	}
 }

@@ -14,11 +14,23 @@ namespace Rendering
 		Camera& operator=(Camera&& rhs) = default;
 		~Camera();
 
+		DirectX::XMVECTOR GetPosition() const;
+		const DirectX::XMFLOAT3& GetPositionAsFloat3() const;
+
+		DirectX::XMVECTOR GetRotation() const;
+		const DirectX::XMFLOAT3& GetRotationAsFloat3() const;
+
 		DirectX::XMVECTOR GetUpVector() const;
 		DirectX::XMFLOAT3 GetUpVectorAsFloat3() const;
 
-		DirectX::XMVECTOR GetPosition() const;
-		const DirectX::XMFLOAT3& GetPositionAsFloat3() const;
+		DirectX::XMVECTOR GetUpVectorN() const;
+		DirectX::XMFLOAT3 GetUpVectorAsFloat3N() const;
+
+		DirectX::XMVECTOR GetRightVectorN() const;
+		DirectX::XMFLOAT3 GetRightVectorAsFloat3N() const;
+
+		DirectX::XMVECTOR GetForwardVectorN() const;
+		DirectX::XMFLOAT3 GetForwardVectorAsFloat3N() const;
 
 		void SetAngle(float angle);
 		float GetAngle() const;
@@ -56,10 +68,19 @@ namespace Rendering
 		void SetPosition(const DirectX::XMFLOAT3& position);
 		void SetPosition(const DirectX::XMVECTOR& position);
 
+		void SetRotation(const DirectX::XMVECTOR& rotation);
+		void SetRotation(const DirectX::XMFLOAT3& rotation);
+
+		void ResetCamera();
+
 	private:
+
 		DirectX::XMFLOAT3 Position;
 		DirectX::XMFLOAT3 Target;
+		DirectX::XMFLOAT3 RightVectorEndPoint;
 		DirectX::XMFLOAT3 UpVectorEndPoint;
+
+		DirectX::XMFLOAT3 Rotation;
 
 		DirectX::XMFLOAT4X4 ViewMatrix;
 		DirectX::XMFLOAT4X4 ProjectionMatrix;

@@ -7,7 +7,7 @@
 
 namespace Rendering
 {
-	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>())
+	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>()), Lights(std::make_shared<LightManager>(SceneManagerReference.GetRenderer()->GetDevice()))
 	{
 		InitializeScene();
 	}
@@ -37,14 +37,20 @@ namespace Rendering
 		device->CreateBuffer(&constantBufferDescription, nullptr, VSCBufferPerObject.GetAddressOf());
 
 		MainCamera->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 30.0f));
+
+		Lights->GetAmbientLight()->SetIntensity(0.5f);
+		Lights->GetDirectionalLight()->SetIntensity(1.5f);
+		Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, -30);
+
+		Lights->UpdateCBufferData();
 	}
 
-	std::shared_ptr<Shader> Scene::GetDefaultVertexShader()
+	std::shared_ptr<Shader>& Scene::GetDefaultVertexShader()
 	{
 		return DefaultPixelShader;
 	}
 
-	std::shared_ptr<Shader> Scene::GetDefaultPixelShader()
+	std::shared_ptr<Shader>& Scene::GetDefaultPixelShader()
 	{
 		return DefaultPixelShader;
 	}
@@ -69,6 +75,11 @@ namespace Rendering
 		return PSCBufferPerFrame.Get();
 	}
 
+	std::shared_ptr<Camera>& Scene::GetCamera()
+	{
+		return MainCamera;
+	}
+
 	std::vector<std::shared_ptr<GameObject>>& Scene::GetGameObjectList()
 	{
 		return GameObjectList;
@@ -76,12 +87,14 @@ namespace Rendering
 
 	void Scene::UpdateScene()
 	{
-		//auto currentPosition = MainCamera->GetPositionAsFloat3();
-		//currentPosition.z += 1.0f;
-		//MainCamera->SetPosition(currentPosition);
 		HandleInput();
 
-		MainCamera->Rotate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), 1);
+		//MainCamera->Rotate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), 0.5f);
+		//auto currentRotation = MainCamera->GetRotationAsFloat3();
+
+		//currentRotation.y += 0.5f;
+
+		//MainCamera->SetRotation(currentRotation);
 
 		for (auto& gameObject : GameObjectList)
 		{
@@ -92,43 +105,77 @@ namespace Rendering
 	void Scene::HandleInput()
 	{
 		static const float speed = 5.0f;
+		static const float rotationGain = 0.25f;
+
 		const std::map<InputManager::InputActions, bool>& inputMap = SceneManagerReference.GetInputManager()->GetInput();
 
-		auto currentPosition = MainCamera->GetPositionAsFloat3();
+		auto currentPosition = MainCamera->GetPosition();
 		if (inputMap.at(InputManager::InputActions::Forward))
 		{
-			currentPosition.z -= speed;
+			currentPosition = DirectX::XMVectorAdd(currentPosition, DirectX::XMVectorScale(MainCamera->GetForwardVectorN(), speed));
 		}
 
 		if (inputMap.at(InputManager::InputActions::Backward))
 		{
-			currentPosition.z += speed;
+			currentPosition = DirectX::XMVectorAdd(currentPosition, DirectX::XMVectorScale(DirectX::XMVectorNegate(MainCamera->GetForwardVectorN()), speed));
 		}
 
 		if (inputMap.at(InputManager::InputActions::StrafeLeft))
 		{
-			currentPosition.x -= speed;
+			currentPosition = DirectX::XMVectorAdd(currentPosition, DirectX::XMVectorScale(DirectX::XMVectorNegate(MainCamera->GetRightVectorN()), speed));
 		}
 
 		if (inputMap.at(InputManager::InputActions::StrafeRight))
 		{
-			currentPosition.x += speed;
+			currentPosition = DirectX::XMVectorAdd(currentPosition, DirectX::XMVectorScale(MainCamera->GetRightVectorN(), speed));
 		}
 
 		if (inputMap.at(InputManager::InputActions::Up))
 		{
-			currentPosition.y += speed;
+			currentPosition = DirectX::XMVectorAdd(currentPosition, DirectX::XMVectorScale(MainCamera->GetUpVectorN(), speed));
 		}
 
 		if (inputMap.at(InputManager::InputActions::Down))
 		{
-			currentPosition.y -= speed;
+			currentPosition = DirectX::XMVectorAdd(currentPosition, DirectX::XMVectorScale(DirectX::XMVectorNegate(MainCamera->GetUpVectorN()), speed));
 		}
 
 		MainCamera->SetPosition(currentPosition);
+
+		if (inputMap.at(InputManager::InputActions::Reset))
+		{
+			MainCamera->ResetCamera();
+		}
+
+		auto currentRotation = MainCamera->GetRotationAsFloat3();
+
+		auto mouseInput = SceneManagerReference.GetInputManager()->GetMouseInput();
+		mouseInput.x *= rotationGain;
+		mouseInput.y *= rotationGain;
+
+		MainCamera->Rotate(MainCamera->GetRightVectorN(), -mouseInput.x);
+		MainCamera->Rotate(MainCamera->GetUpVectorN(), -mouseInput.y);
+
+		/*currentRotation.x -= mouseInput.x;
+		currentRotation.y -= mouseInput.y;
+
+		float limit = 90.0f;
+		currentRotation.x = std::max<float>(-limit, currentRotation.x);
+		currentRotation.x= std::min<float>(+limit, currentRotation.x);
+
+		if (currentRotation.y > 180.0f)
+		{
+			currentRotation.y -= 360.0f;
+		}
+		else if (currentRotation.y < -180.0f)
+		{
+			currentRotation.y += 360.0f;
+		}
+
+		MainCamera->SetRotation(currentRotation);*/
 	}
 
-	void Scene::DrawScene(std::shared_ptr<Direct3D> direct3DRenderer)
+	void Scene::DrawScene(std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
@@ -140,6 +187,8 @@ namespace Rendering
 		deviceContext->VSSetConstantBuffers(0, 1, VSCBufferPerObject.GetAddressOf());
 		
 		deviceContext->PSSetSamplers(0, 1, DefaultSamplerState.GetAddressOf());
+
+		Lights->BindDLightCBuffer(this, direct3DRenderer);
 
 		DirectX::XMMATRIX viewProjectionMatrix = MainCamera->GetViewProjectionMatrix();
 

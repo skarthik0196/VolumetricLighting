@@ -6,6 +6,7 @@ namespace Rendering
 	InputManager::InputManager(HWND windowHandle) : KeyboardComponent(std::make_shared<DirectX::Keyboard>()), MouseComponent(std::make_shared<DirectX::Mouse>())
 	{
 		MouseComponent->SetWindow(windowHandle);
+		MouseComponent->SetMode(DirectX::Mouse::Mode::MODE_RELATIVE);
 	}
 
 	void InputManager::ProcessInput()
@@ -72,9 +73,36 @@ namespace Rendering
 		{
 			KeyPressMap[InputActions::Down] = false;
 		}
+
+		if (kb.R)
+		{
+			KeyPressMap[InputActions::Reset] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::Reset] = false;
+		}
+
+		MouseInput = DirectX::XMFLOAT3(static_cast<float>(mouse.y), static_cast<float>(mouse.x), 0.0f);
+
+		if (mouse.leftButton)
+		{
+			MouseInput.y = 0;
+		}
+		else
+		{
+			MouseInput.x = 0;
+		}
+
 	}
+
 	const std::map<InputManager::InputActions, bool>& InputManager::GetInput()
 	{
 		return KeyPressMap;
+	}
+
+	const DirectX::XMFLOAT3 & InputManager::GetMouseInput()
+	{
+		return MouseInput;
 	}
 }

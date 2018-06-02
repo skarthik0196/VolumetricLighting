@@ -1,11 +1,12 @@
 #pragma once
+#include "Frustum.h"
 
 namespace Rendering
 {
 	class Camera
 	{
 	public:
-		Camera(float nearPlane = 0.01f, float farPlane = 10000.0f);
+		Camera(float screenWidth = 1024.0f, float screenHeight =768.0f, float nearPlane = 0.1f, float farPlane = 10000.0f);
 
 		Camera(const Camera& rhs) = default;
 		Camera(Camera&& rhs) = default;
@@ -73,6 +74,10 @@ namespace Rendering
 
 		void ResetCamera();
 
+		void UpdateFrustum();
+
+		std::shared_ptr<Frustum>& GetFrustum();
+
 	private:
 
 		DirectX::XMFLOAT3 Position;
@@ -91,5 +96,7 @@ namespace Rendering
 		float FarPlane;
 		float ScreenWidth;
 		float ScreenHeight;
+
+		std::shared_ptr<Frustum> CameraFrustum;
 	};
 }

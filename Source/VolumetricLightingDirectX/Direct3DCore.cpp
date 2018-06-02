@@ -130,8 +130,8 @@ namespace Rendering
 		swapChainDescription.Height = static_cast<uint32_t>(ScreenHeight);
 		swapChainDescription.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapChainDescription.Stereo = false;
-		swapChainDescription.SampleDesc.Count = 1;	//MultiSamplingQualityLevels;								
-		swapChainDescription.SampleDesc.Quality = 0;	//MultiSamplingQualityLevels - 1;
+		swapChainDescription.SampleDesc.Count = MultiSamplingQualityLevels;
+		swapChainDescription.SampleDesc.Quality = MultiSamplingQualityLevels - 1;
 		swapChainDescription.BufferCount = BufferCount;
 		swapChainDescription.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDescription.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -142,6 +142,9 @@ namespace Rendering
 
 		Microsoft::WRL::ComPtr<IDXGIAdapter> DxgiAdapter = nullptr;
 		result = DxgiDevice->GetAdapter(DxgiAdapter.GetAddressOf());
+
+		DXGI_ADAPTER_DESC adapterDescription;
+		DxgiAdapter->GetDesc(&adapterDescription);
 
 		Microsoft::WRL::ComPtr<IDXGIFactory2> DxgiFactory = nullptr;
 		result = DxgiAdapter->GetParent(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(DxgiFactory.GetAddressOf()));

@@ -85,14 +85,14 @@ namespace Rendering
 
 		MouseInput = DirectX::XMFLOAT3(static_cast<float>(mouse.y), static_cast<float>(mouse.x), 0.0f);
 
-		if (mouse.leftButton)
+		/*if (mouse.leftButton)
 		{
 			MouseInput.y = 0;
 		}
 		else
 		{
 			MouseInput.x = 0;
-		}
+		}*/
 
 	}
 

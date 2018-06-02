@@ -30,6 +30,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="LightManager.h" />
+    <ClInclude Include="Frustum.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -50,6 +51,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="LightManager.cpp" />
+    <ClCompile Include="Frustum.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">

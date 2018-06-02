@@ -7,7 +7,7 @@
 
 namespace Rendering
 {
-	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>()), Lights(std::make_shared<LightManager>(SceneManagerReference.GetRenderer()->GetDevice()))
+	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>(sceneManagerReference.GetRenderer()->GetScreenWidth(), sceneManagerReference.GetRenderer()->GetScreenHeight())), Lights(std::make_shared<LightManager>(SceneManagerReference.GetRenderer()->GetDevice()))
 	{
 		InitializeScene();
 	}
@@ -36,12 +36,14 @@ namespace Rendering
 
 		device->CreateBuffer(&constantBufferDescription, nullptr, VSCBufferPerObject.GetAddressOf());
 
-		MainCamera->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 30.0f));
+		// Bistro Start
+		MainCamera->Rotate(MainCamera->GetRightVectorN(), -90.0f);
+		MainCamera->Move(DirectX::XMFLOAT3(-750.0f, 0.0, -500.0f));
 
-		Lights->GetAmbientLight()->SetIntensity(0.5f);
-		Lights->GetDirectionalLight()->SetIntensity(1.5f);
-		Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, -30);
-
+		Lights->GetAmbientLight()->SetIntensity(0.25f);
+		Lights->GetDirectionalLight()->SetIntensity(2.0f);
+		Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, 30);
+		//Bistro End
 		Lights->UpdateCBufferData();
 	}
 
@@ -88,13 +90,6 @@ namespace Rendering
 	void Scene::UpdateScene()
 	{
 		HandleInput();
-
-		//MainCamera->Rotate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f), 0.5f);
-		//auto currentRotation = MainCamera->GetRotationAsFloat3();
-
-		//currentRotation.y += 0.5f;
-
-		//MainCamera->SetRotation(currentRotation);
 
 		for (auto& gameObject : GameObjectList)
 		{
@@ -153,8 +148,8 @@ namespace Rendering
 		mouseInput.x *= rotationGain;
 		mouseInput.y *= rotationGain;
 
-		MainCamera->Rotate(MainCamera->GetRightVectorN(), -mouseInput.x);
-		MainCamera->Rotate(MainCamera->GetUpVectorN(), -mouseInput.y);
+		MainCamera->Rotate(MainCamera->GetRightVectorN(), mouseInput.x);
+		MainCamera->Rotate(MainCamera->GetUpVectorN(), mouseInput.y);
 
 		/*currentRotation.x -= mouseInput.x;
 		currentRotation.y -= mouseInput.y;
@@ -191,6 +186,8 @@ namespace Rendering
 		Lights->BindDLightCBuffer(this, direct3DRenderer);
 
 		DirectX::XMMATRIX viewProjectionMatrix = MainCamera->GetViewProjectionMatrix();
+
+		MainCamera->UpdateFrustum();
 
 		for (auto& gameObject : GameObjectList)
 		{

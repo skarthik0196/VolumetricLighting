@@ -53,8 +53,8 @@ namespace Rendering
 		depthStencilBufferDescription.Format = DXGI_FORMAT_D32_FLOAT;
 		depthStencilBufferDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		depthStencilBufferDescription.Usage = D3D11_USAGE_DEFAULT;
-		depthStencilBufferDescription.SampleDesc.Count = 1;
-		depthStencilBufferDescription.SampleDesc.Quality = 0;
+		depthStencilBufferDescription.SampleDesc.Count = GetMultiSamplingQualityLevels();
+		depthStencilBufferDescription.SampleDesc.Quality = GetMultiSamplingQualityLevels() - 1;
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescription;
 		ZeroMemory(&depthStencilViewDescription, sizeof(depthStencilViewDescription));

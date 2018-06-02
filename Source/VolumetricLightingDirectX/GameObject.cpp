@@ -93,6 +93,10 @@ namespace Rendering
 		UNREFERENCED_PARAMETER(direct3DRenderer);
 		UNREFERENCED_PARAMETER(currentScene);
 
+		int unculledMeshes = 0;
+
+		auto& frustum = currentScene->GetCamera()->GetFrustum();
+
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
 		DirectX::XMMATRIX worldMatrix = GetWorldMatrix();
@@ -113,18 +117,22 @@ namespace Rendering
 
 		for (auto& mesh : meshList)
 		{
-			deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
-			deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-
-			if (mesh->GetMaterial() != nullptr)
+			if (frustum->CheckSphere(mesh->GetAverageCenter(), mesh->GetBoundingSphereRadius()))
 			{
-				auto textures = mesh->GetMaterial()->GetTextures();
-				if (textures[Texture::TextureType::Diffuse].size() > 0)
+				unculledMeshes++;
+				deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
+				deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+				if (mesh->GetMaterial() != nullptr)
 				{
-					deviceContext->PSSetShaderResources(0, 1, textures[Texture::TextureType::Diffuse][0]->GetAddressOfShaderResourceView());
+					auto textures = mesh->GetMaterial()->GetTextures();
+					if (textures[Texture::TextureType::Diffuse].size() > 0)
+					{
+						deviceContext->PSSetShaderResources(0, 1, textures[Texture::TextureType::Diffuse][0]->GetAddressOfShaderResourceView());
+					}
 				}
+				deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 			}
-			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 		}		
 	}
 

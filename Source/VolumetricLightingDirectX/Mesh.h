@@ -41,6 +41,9 @@ namespace Rendering
 		uint32_t GetFaceCount() const;
 		uint32_t GetIndexCount() const;
 
+		const float GetBoundingSphereRadius() const;
+		const DirectX::XMFLOAT3& GetAverageCenter() const;
+
 		const std::vector<uint32_t>& GetIndices() const;
 
 		void CreateIndexBuffer(ID3D11Device2* device);
@@ -73,5 +76,9 @@ namespace Rendering
 		std::vector<uint32_t> Indices;
 
 		std::uint32_t MaterialIndex;
+
+		DirectX::XMFLOAT3 AveragedCenter;
+		DirectX::XMFLOAT3 Widths;
+		float SphereRadius;
 	};
 }

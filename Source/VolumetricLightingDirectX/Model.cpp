@@ -52,7 +52,7 @@ namespace Rendering
 
 		Assimp::Importer importer;
 
-		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder;
+		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder | aiProcess_ConvertToLeftHanded;
 		if (flipUVs)
 		{
 			flags |= aiProcess_FlipUVs;
@@ -78,6 +78,6 @@ namespace Rendering
 			{
 				Meshes.push_back(std::make_shared<Mesh>(*this, *(scene->mMeshes[i]), scene->mMeshes[i]->mMaterialIndex, device));
 			}
-		}
+		}	
 	}
 }

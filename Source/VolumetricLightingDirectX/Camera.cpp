@@ -4,7 +4,8 @@
 
 namespace Rendering
 {
-	Camera::Camera(float nearPlane, float farPlane) : NearPlane(nearPlane), FarPlane(farPlane), Position(Utility::Zero), Target(Utility::Forward), RightVectorEndPoint(Utility::Right), Rotation(Utility::Zero), FieldOfView(1.0f), ScreenWidth(1024), ScreenHeight(768)
+	Camera::Camera(float screenWidth, float screenHeight, float nearPlane, float farPlane) : NearPlane(nearPlane), FarPlane(farPlane), Position(Utility::Zero), Target(Utility::Forward), RightVectorEndPoint(Utility::Right), Rotation(Utility::Zero), FieldOfView(1.0f), ScreenWidth(screenWidth), ScreenHeight(screenHeight),
+														CameraFrustum(std::make_shared<Frustum>())
 	{
 		DirectX::XMFLOAT3 temp(Utility::Up);
 		DirectX::XMVECTOR upVector = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Position), DirectX::XMLoadFloat3(&temp));
@@ -171,12 +172,12 @@ namespace Rendering
 
 	void Camera::InitializeViewMatrix()
 	{
-		DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookAtRH(DirectX::XMLoadFloat3(&Position), DirectX::XMLoadFloat3(&Target), GetUpVector()));
+		DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookAtLH(DirectX::XMLoadFloat3(&Position), DirectX::XMLoadFloat3(&Target), GetUpVector()));
 	}
 
 	void Camera::InitializePerspectiveProjectionMatrix()
 	{
-		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovRH(FieldOfView, (ScreenWidth / ScreenHeight), 0.01f, FarPlane));
+		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(FieldOfView, (ScreenWidth / ScreenHeight), 0.01f, FarPlane));
 
 		//DirectX::XMStoreFloat4x4(&ViewProjectionMatrix, DirectX::XMLoadFloat4x4(&ViewMatrix) * DirectX::XMLoadFloat4x4(&ProjectionMatrix));
 	}
@@ -298,5 +299,15 @@ namespace Rendering
 		Rotation = Utility::Zero;
 
 		InitializeViewMatrix();
+	}
+
+	void Camera::UpdateFrustum()
+	{
+		CameraFrustum->ConstructFrustum(FarPlane, ProjectionMatrix, ViewMatrix);
+	}
+
+	std::shared_ptr<Frustum>& Camera::GetFrustum()
+	{
+		return CameraFrustum;
 	}
 }

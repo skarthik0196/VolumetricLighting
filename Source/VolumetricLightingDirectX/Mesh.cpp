@@ -9,10 +9,30 @@ namespace Rendering
 	Mesh::Mesh(Model& model, aiMesh& mesh, uint32_t materialIndex, ID3D11Device2* D3Ddevice) : ReferenceToModel(model), FaceCount(0), Name(mesh.mName.C_Str()), MaterialIndex(materialIndex)
 	{
 		Vertices.reserve(mesh.mNumVertices);
+
+
+		DirectX::XMFLOAT3 minimums (DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mVertices[0])));
+		DirectX::XMFLOAT3 maximums (DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mVertices[0])));
+
 		for (uint32_t i = 0; i < mesh.mNumVertices; ++i)
 		{
-			Vertices.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mVertices[i])));
+			auto currentVertex = mesh.mVertices[i];
+			Vertices.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&currentVertex)));
+
+			minimums.x = std::min<float>(minimums.x, currentVertex.x);
+			minimums.y = std::min<float>(minimums.y, currentVertex.y);
+			minimums.z = std::min<float>(minimums.z, currentVertex.z);
+
+			maximums.x = std::max<float>(maximums.x, currentVertex.x);
+			maximums.y = std::max<float>(maximums.y, currentVertex.y);
+			maximums.z = std::max<float>(maximums.z, currentVertex.z);
+
 		}
+
+		AveragedCenter = DirectX::XMFLOAT3((minimums.x + maximums.x) / 2, (minimums.y + maximums.y) / 2, (minimums.z + maximums.z) / 2);
+		Widths = DirectX::XMFLOAT3(maximums.x - minimums.x, maximums.x - minimums.y, maximums.z - minimums.z);
+
+		SphereRadius = std::max<float>(std::max<float>(Widths.x, Widths.y), Widths.z);
 
 		if (mesh.HasNormals())
 		{
@@ -20,6 +40,7 @@ namespace Rendering
 			for (uint32_t i = 0; i < mesh.mNumVertices; ++i)
 			{
 				Normals.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mNormals[i])));
+				//Normals.back().z = -Normals.back().z;
 			}
 		}
 
@@ -126,6 +147,16 @@ namespace Rendering
 	uint32_t Mesh::GetIndexCount() const
 	{
 		return static_cast<uint32_t>(Indices.size());
+	}
+
+	const float Mesh::GetBoundingSphereRadius() const
+	{
+		return SphereRadius;
+	}
+
+	const DirectX::XMFLOAT3 & Mesh::GetAverageCenter() const
+	{
+		return AveragedCenter;
 	}
 
 	const std::vector<uint32_t>& Mesh::GetIndices() const

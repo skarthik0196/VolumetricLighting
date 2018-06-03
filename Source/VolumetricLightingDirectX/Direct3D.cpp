@@ -147,4 +147,9 @@ namespace Rendering
 	{
 		return VSync;
 	}
+
+	ID3D11DepthStencilView* Direct3D::GetDepthStencilView()
+	{
+		return DepthStencilView.Get();
+	}
 }

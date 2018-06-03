@@ -5,7 +5,7 @@
 
 namespace Rendering
 {
-	LightManager::LightManager(ID3D11Device2* device) : AmbientLight(std::make_shared<Light>()), DLight(std::make_shared<DirectionalLight>())
+	LightManager::LightManager(ID3D11Device2* device) : AmbientLight(std::make_shared<Light>()), DLight(std::make_shared<DirectionalLight>()), PostProcessingShader(std::make_shared<Shader>(L"PostProcessingPixelShader.cso", Shader::ShaderType::PixelShader, device))
 	{
 		Initialize(device);
 	}
@@ -51,5 +51,10 @@ namespace Rendering
 		DirectionalLightData.AmbientLightColor = AmbientLight->GetColor();
 		DirectionalLightData.DirectionalLightColor = DLight->GetColor();
 		DirectionalLightData.DirectionalLightDirection = DLight->GetDirectionAsFloat3();
+	}
+
+	std::shared_ptr<Shader>& LightManager::GetPostProcessingShader()
+	{
+		return PostProcessingShader;
 	}
 }

@@ -7,7 +7,8 @@
 
 namespace Rendering
 {
-	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>(sceneManagerReference.GetRenderer()->GetScreenWidth(), sceneManagerReference.GetRenderer()->GetScreenHeight())), Lights(std::make_shared<LightManager>(SceneManagerReference.GetRenderer()->GetDevice()))
+	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>(sceneManagerReference.GetRenderer()->GetScreenWidth(), sceneManagerReference.GetRenderer()->GetScreenHeight())), Lights(std::make_shared<LightManager>(SceneManagerReference.GetRenderer()->GetDevice())),
+														GBuffer1(std::make_shared<GBuffer>(sceneManagerReference.GetRenderer())), ScreenQuad1(std::make_shared<ScreenQuad>(sceneManagerReference.GetRenderer()->GetDevice()))
 	{
 		InitializeScene();
 	}
@@ -16,8 +17,8 @@ namespace Rendering
 	{
 		ID3D11Device2* device = SceneManagerReference.GetRenderer()->GetDevice();
 
-		DefaultVertexShader = std::make_shared<Shader>(L"DefaultVertexShader.cso", Shader::ShaderType::VertexShader, device);
-		DefaultPixelShader = std::make_shared<Shader>(L"DefaultPixelShader.cso", Shader::ShaderType::PixelShader, device);
+		DefaultVertexShader = std::make_shared<Shader>(L"DefaultDeferredGeometryVertexShader.cso", Shader::ShaderType::VertexShader, device);
+		DefaultPixelShader = std::make_shared<Shader>(L"DefaultDeferredGeometryPixelShader.cso", Shader::ShaderType::PixelShader, device);
 
 		D3D11_SAMPLER_DESC samplerDescription;
 		ZeroMemory(&samplerDescription, sizeof(samplerDescription));
@@ -37,13 +38,26 @@ namespace Rendering
 		device->CreateBuffer(&constantBufferDescription, nullptr, VSCBufferPerObject.GetAddressOf());
 
 		// Bistro Start
+
 		MainCamera->Rotate(MainCamera->GetRightVectorN(), -90.0f);
 		MainCamera->Move(DirectX::XMFLOAT3(-750.0f, 0.0, -500.0f));
 
 		Lights->GetAmbientLight()->SetIntensity(0.25f);
 		Lights->GetDirectionalLight()->SetIntensity(2.0f);
 		Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, 30);
+
 		//Bistro End
+
+		//Sponza Start
+		/*MainCamera->Move(DirectX::XMFLOAT3(30.0f, 0.0f, 0.0f));
+		MainCamera->Rotate(MainCamera->GetUpVector(), 90.0f);*/
+
+		//Lights->GetAmbientLight()->SetIntensity(0.5f);
+		//Lights->GetDirectionalLight()->SetIntensity(1.5f);
+		//Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 30);
+
+		//Sponza End
+
 		Lights->UpdateCBufferData();
 	}
 
@@ -174,6 +188,9 @@ namespace Rendering
 	{
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
+		GBuffer1->SetRenderTargets(direct3DRenderer);
+		GBuffer1->ClearRenderTargets(direct3DRenderer);
+
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->VSSetShader(DefaultVertexShader->GetVertexShader(), 0, 0);
 		deviceContext->PSSetShader(DefaultPixelShader->GetPixelShader(), 0, 0);
@@ -183,8 +200,6 @@ namespace Rendering
 		
 		deviceContext->PSSetSamplers(0, 1, DefaultSamplerState.GetAddressOf());
 
-		Lights->BindDLightCBuffer(this, direct3DRenderer);
-
 		DirectX::XMMATRIX viewProjectionMatrix = MainCamera->GetViewProjectionMatrix();
 
 		MainCamera->UpdateFrustum();
@@ -193,6 +208,14 @@ namespace Rendering
 		{
 			gameObject->Draw(direct3DRenderer, this , viewProjectionMatrix);
 		}
+
+		direct3DRenderer->SetSingleRenderTarget();
+		ScreenQuad1->BindScreenQuadVertexShader(deviceContext);
+		deviceContext->PSSetShader(Lights->GetPostProcessingShader()->GetPixelShader(), 0, 0);
+		GBuffer1->BindGBufferData(deviceContext);
+		Lights->BindDLightCBuffer(this, direct3DRenderer);
+		ScreenQuad1->DrawScreenQuad(deviceContext);
+		
 	}
 
 	void Scene::AddGameObject(std::shared_ptr<GameObject> gameObject)

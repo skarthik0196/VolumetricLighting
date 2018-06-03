@@ -1,5 +1,6 @@
 #pragma once
 #include "Direct3DCore.h"
+#include "Utility.h"
 
 namespace Rendering
 {
@@ -15,7 +16,7 @@ namespace Rendering
 		void InitializeDirect3D();
 		void CreateViewPort();
 
-		void ClearRenderTarget(DirectX::XMFLOAT4 BGColor = DirectX::XMFLOAT4(0.0f, 0.2f, 0.4f, 1.0f));
+		void ClearRenderTarget(DirectX::XMFLOAT4 BGColor = Utility::BackgroundColor);
 		void ClearDepthStencilView();
 		void RenderToScreen();
 
@@ -24,6 +25,8 @@ namespace Rendering
 		void SetDepthDepthStencilState();
 
 		bool GetVSyncStatus();
+
+		ID3D11DepthStencilView* GetDepthStencilView();
 
 	private:
 		uint32_t MipLevels;

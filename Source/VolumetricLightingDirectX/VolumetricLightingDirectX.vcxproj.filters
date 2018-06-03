@@ -31,6 +31,8 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="Frustum.h" />
+    <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="ScreenQuad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -52,6 +54,8 @@
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="Frustum.cpp" />
+    <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="ScreenQuad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -74,6 +78,18 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="DefaultPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultDeferredGeometryVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultDeferredGeometryPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ScreenQuadVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PostProcessingPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

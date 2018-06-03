@@ -18,5 +18,7 @@ namespace Rendering
 
 		static DirectX::XMFLOAT4X4 IdentityMatrix;
 
+		static DirectX::XMFLOAT4 BackgroundColor;
+
 	};
 }

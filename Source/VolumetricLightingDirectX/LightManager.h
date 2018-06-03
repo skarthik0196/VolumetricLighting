@@ -6,6 +6,7 @@ namespace Rendering
 {
 	class Scene;
 	class Direct3D;
+	class Shader;
 
 	class LightManager
 	{
@@ -31,6 +32,8 @@ namespace Rendering
 		void BindDLightCBuffer(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 		void UpdateCBufferData();
 
+		std::shared_ptr<Shader>& GetPostProcessingShader();
+
 
 	private:
 		DirectionalAmbientLightData DirectionalLightData;
@@ -39,6 +42,8 @@ namespace Rendering
 		std::shared_ptr<Light> AmbientLight;
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> DLightCBuffer;
+
+		std::shared_ptr<Shader> PostProcessingShader;
 
 	};
 }

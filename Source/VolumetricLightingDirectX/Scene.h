@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "LightManager.h"
+#include "GBuffer.h"
+#include "ScreenQuad.h"
 
 namespace Rendering
 {
@@ -45,6 +47,8 @@ namespace Rendering
 		
 		std::shared_ptr<Camera> MainCamera;
 		std::shared_ptr<LightManager> Lights;
+		std::shared_ptr<GBuffer> GBuffer1;
+		std::shared_ptr<ScreenQuad> ScreenQuad1;
 
 		std::shared_ptr<Shader> DefaultVertexShader;
 		std::shared_ptr<Shader> DefaultPixelShader;
@@ -55,8 +59,6 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11Buffer> PSCBufferPerFrame;
 
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> DefaultSamplerState;
-
-
 	};
 }
 

@@ -8,54 +8,148 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{ea70a8a2-19f3-493e-9a4e-faf161e7d75c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LightClasses">
+      <UniqueIdentifier>{e7c24294-ec31-4dd3-b9d0-b2d4f10c2506}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObjectComponents">
+      <UniqueIdentifier>{fa53b07b-6681-4e95-9249-dddf8643515a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CoreRenderingClasses">
+      <UniqueIdentifier>{b71171bc-3a95-4016-8a67-2885c04784a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{5a538911-4a6c-4c02-bbd8-10b75bac06b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="VolumetricLightingDirectX.h" />
-    <ClInclude Include="Direct3DCore.h" />
-    <ClInclude Include="Direct3D.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Utility.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="InputManager.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="DirectionalLight.h" />
-    <ClInclude Include="LightManager.h" />
-    <ClInclude Include="Frustum.h" />
-    <ClInclude Include="GBuffer.h" />
-    <ClInclude Include="ScreenQuad.h" />
+    <ClInclude Include="Light.h">
+      <Filter>LightClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="LightManager.h">
+      <Filter>LightClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>LightClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>LightClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Direct3D.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Direct3DCore.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Frustum.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenQuad.h">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="VolumetricLightingDirectX.cpp" />
-    <ClCompile Include="Direct3DCore.cpp" />
-    <ClCompile Include="Direct3D.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Utility.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="LightManager.cpp" />
-    <ClCompile Include="Frustum.cpp" />
-    <ClCompile Include="GBuffer.cpp" />
-    <ClCompile Include="ScreenQuad.cpp" />
+    <ClCompile Include="Light.cpp">
+      <Filter>LightClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="LightManager.cpp">
+      <Filter>LightClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>LightClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>LightClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>ObjectComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>ObjectComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>ObjectComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3D.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3DCore.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustum.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenQuad.cpp">
+      <Filter>CoreRenderingClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -90,6 +184,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="PostProcessingPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PointLightPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PointLightVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

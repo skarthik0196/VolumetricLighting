@@ -83,6 +83,24 @@ namespace Rendering
 			KeyPressMap[InputActions::Reset] = false;
 		}
 
+		if (kb.Z)
+		{
+			KeyPressMap[InputActions::IncreaseAttribute] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::IncreaseAttribute] = false;
+		}
+
+		if (kb.C)
+		{
+			KeyPressMap[InputActions::DecreaseAttribute] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::DecreaseAttribute] = false;
+		}
+
 		MouseInput = DirectX::XMFLOAT3(static_cast<float>(mouse.y), static_cast<float>(mouse.x), 0.0f);
 
 		/*if (mouse.leftButton)

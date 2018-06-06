@@ -15,6 +15,8 @@ namespace Rendering
 			StrafeRight,
 			Up,
 			Down,
+			IncreaseAttribute,
+			DecreaseAttribute,
 			Reset
 		};
 

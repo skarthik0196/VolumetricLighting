@@ -40,7 +40,7 @@ namespace Rendering
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDescription;
 		ZeroMemory(&renderTargetViewDescription, sizeof(renderTargetViewDescription));
 
-		renderTargetViewDescription.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+		renderTargetViewDescription.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		renderTargetViewDescription.Format = textureDescription.Format;
 		renderTargetViewDescription.Texture2D.MipSlice = 0;
 
@@ -54,7 +54,7 @@ namespace Rendering
 		ZeroMemory(&shaderViewDescription, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
 
 		shaderViewDescription.Format = textureDescription.Format;
-		shaderViewDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+		shaderViewDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		shaderViewDescription.Texture2D.MostDetailedMip = 0;
 		shaderViewDescription.Texture2D.MipLevels = 1;
 
@@ -92,6 +92,12 @@ namespace Rendering
 	void GBuffer::BindGBufferData(ID3D11DeviceContext2 * deviceContext)
 	{
 		ID3D11ShaderResourceView* shaderResourceViews[] = { ShaderResourceViews[0].Get(), ShaderResourceViews[1].Get(), ShaderResourceViews[2].Get() };
+		deviceContext->PSSetShaderResources(0, ARRAYSIZE(shaderResourceViews), shaderResourceViews);
+	}
+
+	void GBuffer::UnBindBufferData(ID3D11DeviceContext2 * deviceContext)
+	{
+		ID3D11ShaderResourceView* shaderResourceViews[] = { nullptr, nullptr, nullptr };
 		deviceContext->PSSetShaderResources(0, ARRAYSIZE(shaderResourceViews), shaderResourceViews);
 	}
 }

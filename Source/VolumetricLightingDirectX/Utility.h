@@ -15,6 +15,8 @@ namespace Rendering
 		static DirectX::XMFLOAT3 Zero;
 
 		static DirectX::XMFLOAT4 White;
+		static DirectX::XMFLOAT4 Black;
+		static DirectX::XMFLOAT4 Red;
 
 		static DirectX::XMFLOAT4X4 IdentityMatrix;
 

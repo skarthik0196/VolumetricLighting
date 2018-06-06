@@ -5,6 +5,7 @@ namespace Rendering
 {
 	class ScreenQuad
 	{
+
 	public:
 		ScreenQuad(ID3D11Device2* device);
 		~ScreenQuad() = default;
@@ -16,6 +17,7 @@ namespace Rendering
 	private:
 
 		std::shared_ptr<Shader> ScreenQuadVS;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> VertexBuffer;
 				
 	};
 

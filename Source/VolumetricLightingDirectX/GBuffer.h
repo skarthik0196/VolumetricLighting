@@ -29,6 +29,7 @@ namespace Rendering
 		ID3D11ShaderResourceView** GetAddressOfShaderResourceView(GBufferData resourceType);
 
 		void BindGBufferData(ID3D11DeviceContext2* deviceContext);
+		void UnBindBufferData(ID3D11DeviceContext2* deviceContext);
 
 	private:
 

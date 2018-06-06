@@ -26,23 +26,6 @@ namespace Rendering
 		D3D11_TEXTURE2D_DESC depthBufferDescription;
 		BackBuffer->GetDesc(&depthBufferDescription);
 
-		//D3D11_TEXTURE2D_DESC depthBufferDescription;
-		//ZeroMemory(&depthBufferDescription, sizeof(D3D11_TEXTURE2D_DESC));
-
-		//depthBufferDescription.Width = static_cast<uint32_t>(ScreenWidth);
-		//depthBufferDescription.Height = static_cast<uint32_t>(ScreenHeight);
-		//depthBufferDescription.MipLevels = MipLevels;
-		//depthBufferDescription.ArraySize = 1;
-		//depthBufferDescription.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		//depthBufferDescription.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-		//depthBufferDescription.Usage = D3D11_USAGE_DEFAULT;
-		//depthBufferDescription.SampleDesc.Count = 1;
-		//depthBufferDescription.SampleDesc.Quality = 0;
-		//depthBufferDescription.CPUAccessFlags = 0;
-		//depthBufferDescription.MiscFlags = 0;
-
-		//result = Device->CreateTexture2D(&depthBufferDescription, nullptr, BackBuffer.GetAddressOf());
-
 		D3D11_TEXTURE2D_DESC depthStencilBufferDescription;
 		ZeroMemory(&depthStencilBufferDescription, sizeof(D3D11_TEXTURE2D_DESC));
 
@@ -50,7 +33,7 @@ namespace Rendering
 		depthStencilBufferDescription.Height = static_cast<uint32_t>(ScreenHeight);
 		depthStencilBufferDescription.MipLevels = MipLevels;
 		depthStencilBufferDescription.ArraySize = 1;
-		depthStencilBufferDescription.Format = DXGI_FORMAT_D32_FLOAT;
+		depthStencilBufferDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthStencilBufferDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		depthStencilBufferDescription.Usage = D3D11_USAGE_DEFAULT;
 		depthStencilBufferDescription.SampleDesc.Count = GetMultiSamplingQualityLevels();
@@ -59,8 +42,8 @@ namespace Rendering
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescription;
 		ZeroMemory(&depthStencilViewDescription, sizeof(depthStencilViewDescription));
 
-		depthStencilViewDescription.Format = DXGI_FORMAT_D32_FLOAT;
-		depthStencilViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		depthStencilViewDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDescription.Flags = 0;
 		depthStencilViewDescription.Texture2D.MipSlice = 0;
 
@@ -88,12 +71,19 @@ namespace Rendering
 		depthStencilDescription.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 		depthStencilDescription.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;*/
 
-		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthStencilState.GetAddressOf());
+		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthEnabledState.GetAddressOf());
 		result = Device->CreateDepthStencilView(DepthBuffer.Get(), &depthStencilViewDescription, DepthStencilView.GetAddressOf());
+
+		depthStencilDescription.DepthEnable = true;
+		depthStencilDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		depthStencilDescription.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthDisabledState.ReleaseAndGetAddressOf());
 
 		result = GetDevice()->CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf());
 
-		SetDepthDepthStencilState();
+		CreateBlendStates();
+
+		EnableDepthTesting();
 		SetSingleRenderTarget();
 		CreateViewPort();
 	}
@@ -111,6 +101,31 @@ namespace Rendering
 		viewPortDescription.MaxDepth = 1;
 
 		DeviceContext->RSSetViewports(1, &viewPortDescription);
+	}
+
+	void Direct3D::CreateBlendStates()
+	{
+		D3D11_BLEND_DESC blendStateDescription;
+		ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+
+		blendStateDescription.RenderTarget[0].BlendEnable = true;
+
+		blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+		blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+		blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+		blendStateDescription.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		blendStateDescription.AlphaToCoverageEnable = false;
+		blendStateDescription.IndependentBlendEnable = false;
+		Device->CreateBlendState(&blendStateDescription, FirstAdditiveBlendState.ReleaseAndGetAddressOf());
+
+		blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+		blendStateDescription.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		Device->CreateBlendState(&blendStateDescription, AdditiveBlendState.ReleaseAndGetAddressOf());
 	}
 
 	void Direct3D::ClearRenderTarget(DirectX::XMFLOAT4 BGColor)
@@ -138,14 +153,35 @@ namespace Rendering
 		DeviceContext->OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), DepthStencilView.Get());
 	}
 
-	void Direct3D::SetDepthDepthStencilState()
+	void Direct3D::EnableDepthTesting()
 	{
-		DeviceContext->OMSetDepthStencilState(DepthStencilState.Get(), 1);
+		DeviceContext->OMSetDepthStencilState(DepthEnabledState.Get(), 1);
 	}
 
 	bool Direct3D::GetVSyncStatus()
 	{
 		return VSync;
+	}
+
+	void Direct3D::DisableDepthTesting()
+	{
+		DeviceContext->OMSetDepthStencilState(DepthDisabledState.Get(), 1);
+	}
+
+	void Direct3D::BeginAdditiveBlending()
+	{
+		DeviceContext->OMSetBlendState(FirstAdditiveBlendState.Get(), NULL, 0xFFFFFFFF);
+	}
+
+	void Direct3D::EnableAdditiveBlending()
+	{
+		DeviceContext->OMSetBlendState(AdditiveBlendState.Get(), NULL, 0xFFFFFFFF);
+	}
+
+	void Direct3D::DisableBlending()
+	{
+		
+		DeviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
 	}
 
 	ID3D11DepthStencilView* Direct3D::GetDepthStencilView()

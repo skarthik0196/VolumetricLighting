@@ -26,7 +26,7 @@ namespace Rendering
 		textureDescription.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		textureDescription.MipLevels = 1;
 		textureDescription.ArraySize = 1;
-		textureDescription.SampleDesc.Count = direct3DRenderer->GetMultiSamplingQualityLevels();
+		textureDescription.SampleDesc.Count = direct3DRenderer->GetMultiSamplingCount();
 		textureDescription.SampleDesc.Quality = direct3DRenderer->GetMultiSamplingQualityLevels() - 1;
 
 		ID3D11Device2* device = direct3DRenderer->GetDevice();

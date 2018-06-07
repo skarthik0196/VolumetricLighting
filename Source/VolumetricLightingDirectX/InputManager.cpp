@@ -56,7 +56,7 @@ namespace Rendering
 			KeyPressMap[InputActions::StrafeLeft] = false;
 		}
 
-		if (kb.Q)
+		if (kb.E)
 		{
 			KeyPressMap[InputActions::Up] = true;
 		}
@@ -65,7 +65,7 @@ namespace Rendering
 			KeyPressMap[InputActions::Up] = false;
 		}
 
-		if (kb.E)
+		if (kb.Q)
 		{
 			KeyPressMap[InputActions::Down] = true;
 		}

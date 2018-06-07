@@ -27,7 +27,8 @@ namespace Rendering
 	
 	public:
 		GameObject(Transform transform = Transform(), const std::string& ModelPath = "" , bool flipUVs = false, ID3D11Device2* device = nullptr);
-		~GameObject();
+		GameObject(Transform transform = Transform(), std::shared_ptr<Model> model = nullptr);
+		virtual ~GameObject();
 
 		const Transform& GetTransform() const;
 		const DirectX::XMFLOAT3& GetPosition() const;
@@ -47,7 +48,7 @@ namespace Rendering
 
 		std::shared_ptr<Model>& GetObjectModel();
 
-	private:
+	protected:
 
 		void UpdateWorldMatrix();
 

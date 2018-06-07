@@ -17,6 +17,14 @@ namespace Rendering
 		}
 	}
 
+	GameObject::GameObject(Transform transform, std::shared_ptr<Model> model) : ObjectTransform(transform)
+	{
+		if (model != nullptr)
+		{
+			ObjectModel = model;
+		}
+	}
+
 	GameObject::~GameObject()
 	{
 	}

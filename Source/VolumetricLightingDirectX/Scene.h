@@ -29,6 +29,7 @@ namespace Rendering
 
 		std::shared_ptr<Shader>& GetDefaultVertexShader();
 		std::shared_ptr<Shader>& GetDefaultPixelShader();
+		std::shared_ptr<LightManager>& GetLightManager();
 
 		ID3D11Buffer* GetVSCBufferPerObject();
 		ID3D11Buffer* GetVSCBufferPerFrame();

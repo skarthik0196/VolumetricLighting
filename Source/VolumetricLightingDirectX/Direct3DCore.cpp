@@ -49,12 +49,12 @@ LRESULT CALLBACK WindowProc(HWND windHandle, UINT message, WPARAM wParam, LPARAM
 
 namespace Rendering
 {
-	Direct3DCore::Direct3DCore() : ScreenWidth(1024), ScreenHeight(768), MultiSamplingCount(4), BufferCount(2), RefreshRate(60), IsWindowed(true)
+	Direct3DCore::Direct3DCore() : ScreenWidth(1024), ScreenHeight(768), MultiSamplingCount(1), BufferCount(2), RefreshRate(60), IsWindowed(true)
 	{
 		
 	}
 
-	Direct3DCore::Direct3DCore(float screenWidth, float screenHeight) : ScreenWidth(screenWidth), ScreenHeight(screenHeight), MultiSamplingCount(4), BufferCount(2), RefreshRate(60), IsWindowed(true)
+	Direct3DCore::Direct3DCore(float screenWidth, float screenHeight) : ScreenWidth(screenWidth), ScreenHeight(screenHeight), MultiSamplingCount(1), BufferCount(2), RefreshRate(60), IsWindowed(true)
 	{
 
 	}
@@ -130,7 +130,7 @@ namespace Rendering
 		swapChainDescription.Height = static_cast<uint32_t>(ScreenHeight);
 		swapChainDescription.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapChainDescription.Stereo = false;
-		swapChainDescription.SampleDesc.Count = MultiSamplingQualityLevels;
+		swapChainDescription.SampleDesc.Count = MultiSamplingCount;
 		swapChainDescription.SampleDesc.Quality = MultiSamplingQualityLevels - 1;
 		swapChainDescription.BufferCount = BufferCount;
 		swapChainDescription.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;

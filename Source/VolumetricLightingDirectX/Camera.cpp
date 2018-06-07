@@ -177,7 +177,7 @@ namespace Rendering
 
 	void Camera::InitializePerspectiveProjectionMatrix()
 	{
-		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(FieldOfView), (ScreenWidth / ScreenHeight), 0.01f, FarPlane));
+		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(FieldOfView), (ScreenWidth / ScreenHeight), NearPlane, FarPlane));
 
 		//DirectX::XMStoreFloat4x4(&ViewProjectionMatrix, DirectX::XMLoadFloat4x4(&ViewMatrix) * DirectX::XMLoadFloat4x4(&ProjectionMatrix));
 	}

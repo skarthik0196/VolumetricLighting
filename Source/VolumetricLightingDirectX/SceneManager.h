@@ -18,6 +18,7 @@ namespace Rendering
 
 		std::shared_ptr<Scene> GetCurrentScene();
 
+		void CreateSolarSytemScene();
 		void LoadScene(const std::string& filePath);
 		void CreateScene();
 

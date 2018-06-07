@@ -86,6 +86,7 @@
     <ClInclude Include="InputManager.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="CelestialBody.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Utility.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="CelestialBody.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">

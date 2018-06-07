@@ -6,7 +6,7 @@ namespace Rendering
 	class Camera
 	{
 	public:
-		Camera(float screenWidth = 1024.0f, float screenHeight =768.0f, float nearPlane = 0.1f, float farPlane = 10000.0f);
+		Camera(float screenWidth = 1024.0f, float screenHeight =768.0f, float nearPlane = 1.0f, float farPlane = 10000.0f);
 
 		Camera(const Camera& rhs) = default;
 		Camera(Camera&& rhs) = default;

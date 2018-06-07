@@ -33,16 +33,16 @@ namespace Rendering
 		depthStencilBufferDescription.Height = static_cast<uint32_t>(ScreenHeight);
 		depthStencilBufferDescription.MipLevels = MipLevels;
 		depthStencilBufferDescription.ArraySize = 1;
-		depthStencilBufferDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilBufferDescription.Format = DXGI_FORMAT_D32_FLOAT;
 		depthStencilBufferDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		depthStencilBufferDescription.Usage = D3D11_USAGE_DEFAULT;
-		depthStencilBufferDescription.SampleDesc.Count = GetMultiSamplingQualityLevels();
+		depthStencilBufferDescription.SampleDesc.Count = GetMultiSamplingCount();
 		depthStencilBufferDescription.SampleDesc.Quality = GetMultiSamplingQualityLevels() - 1;
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescription;
 		ZeroMemory(&depthStencilViewDescription, sizeof(depthStencilViewDescription));
 
-		depthStencilViewDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilViewDescription.Format = DXGI_FORMAT_D32_FLOAT;
 		depthStencilViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDescription.Flags = 0;
 		depthStencilViewDescription.Texture2D.MipSlice = 0;

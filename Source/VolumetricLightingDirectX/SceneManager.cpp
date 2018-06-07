@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "GameObject.h"
+#include "CelestialBody.h"
 
 namespace Rendering
 {
@@ -35,6 +36,46 @@ namespace Rendering
 	std::shared_ptr<Scene> SceneManager::GetCurrentScene()
 	{
 		return SceneList[CurrentSceneIndex];
+	}
+
+	void SceneManager::CreateSolarSytemScene()
+	{
+		std::shared_ptr<Model> sphereModel= std::make_shared<Model>(Direct3DRenderer->GetDevice(), "Content\\Models\\Sphere.obj");
+		std::shared_ptr<GameObject> earth= std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Earth.jpg", Direct3DRenderer->GetDevice());
+
+		auto& currentScene = SceneList.back();
+
+		currentScene->AddGameObject(earth);
+
+		std::shared_ptr<GameObject> venus = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Venus.jpg", Direct3DRenderer->GetDevice(), 0.723f, 0.949f);
+		currentScene->AddGameObject(venus);
+
+		std::shared_ptr<GameObject> mercury = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Mercury.jpg", Direct3DRenderer->GetDevice(), 0.387f, 0.382f);
+		currentScene->AddGameObject(mercury);
+
+		std::shared_ptr<GameObject> mars = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Mars.jpg", Direct3DRenderer->GetDevice(), 1.524f, 0.532f);
+		currentScene->AddGameObject(mars);
+
+		std::shared_ptr<GameObject> jupiter = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Jupiter.jpg", Direct3DRenderer->GetDevice(), 5.203f, 11.19f);
+		currentScene->AddGameObject(jupiter);
+
+		std::shared_ptr<GameObject> saturn = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Saturn.jpg", Direct3DRenderer->GetDevice(), 9.582f, 9.26f);
+		currentScene->AddGameObject(saturn);
+
+		std::shared_ptr<GameObject> uranus = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Uranus.jpg", Direct3DRenderer->GetDevice(), 19.20f, 4.01f);
+		currentScene->AddGameObject(uranus);
+
+		std::shared_ptr<GameObject> neptune = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Neptune.jpg", Direct3DRenderer->GetDevice(), 30.05f, 3.88f);
+		currentScene->AddGameObject(neptune);
+
+		std::shared_ptr<GameObject> pluto = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Pluto.jpg", Direct3DRenderer->GetDevice(), 39.48f, 0.18f);
+		currentScene->AddGameObject(pluto);
+
+		std::shared_ptr<GameObject> sun = std::make_shared<CelestialBody>(sphereModel, L"Content\\Textures\\PlanetTextures\\Sun.jpg", Direct3DRenderer->GetDevice(), -0.01f);
+		currentScene->AddGameObject(sun);
+		sun->SetScale(DirectX::XMFLOAT3(3.0f, 3.0f, 3.0f));
+		//currentScene->GetLightManager()->CreatePointLight(sun->GetPosition(), Utility::White, 1.0f, 100000.0f);
+		
 	}
 
 	void SceneManager::LoadScene(const std::string& filePath)

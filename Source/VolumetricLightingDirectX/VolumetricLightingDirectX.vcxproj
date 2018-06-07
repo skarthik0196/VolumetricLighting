@@ -192,6 +192,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CelestialBody.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Direct3DCore.h" />
     <ClInclude Include="DirectionalLight.h" />
@@ -218,6 +219,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CelestialBody.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Direct3DCore.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />

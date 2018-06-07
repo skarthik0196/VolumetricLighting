@@ -26,6 +26,11 @@ namespace Rendering
 		samplerDescription.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDescription.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDescription.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		//samplerDescription.MaxLOD = D3D11_FLOAT32_MAX;
+		//samplerDescription.MinLOD = 0;
+		//samplerDescription.MipLODBias = 0.0f;
+		//samplerDescription.MaxAnisotropy = 1;
+		//samplerDescription.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
 		device->CreateSamplerState(&samplerDescription, DefaultSamplerState.GetAddressOf());
 
@@ -60,6 +65,7 @@ namespace Rendering
 		//Bistro End
 
 		//Sponza Start
+
 		MainCamera->Move(DirectX::XMFLOAT3(30.0f, 100.0f, 0.0f));
 		MainCamera->Rotate(MainCamera->GetUpVector(), 90.0f);
 
@@ -80,6 +86,16 @@ namespace Rendering
 
 		//Sponza End
 
+		//Solar System Begin
+
+		/*Lights->GetAmbientLight()->SetIntensity(0.5f);
+		Lights->GetDirectionalLight()->SetIntensity(1.0f);
+		Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, 30);
+
+		MainCamera->Move(DirectX::XMFLOAT3(0.0f, 0.0f, -30.0f));*/
+
+		//Solar System End
+
 		Lights->UpdateDirectionalCBufferData();
 	}
 
@@ -91,6 +107,11 @@ namespace Rendering
 	std::shared_ptr<Shader>& Scene::GetDefaultPixelShader()
 	{
 		return DefaultPixelShader;
+	}
+
+	std::shared_ptr<LightManager>& Scene::GetLightManager()
+	{
+		return Lights;
 	}
 
 	ID3D11Buffer* Scene::GetVSCBufferPerObject()
@@ -173,14 +194,18 @@ namespace Rendering
 
 		if (inputMap.at(InputManager::InputActions::IncreaseAttribute))
 		{
-			auto& pLight = Lights->GetPointLight(0);
-			pLight->SetRadius(pLight->GetRadius() + 10.0f);
+			/*auto& pLight = Lights->GetPointLight(0);
+			pLight->SetRadius(pLight->GetRadius() + 10.0f);*/
+			
+			MainCamera->SetNearPlane(MainCamera->GetNearPlane() +10.0f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseAttribute))
 		{
-			auto& pLight = Lights->GetPointLight(0);
-			pLight->SetRadius(pLight->GetRadius() - 10.0f);
+			/*auto& pLight = Lights->GetPointLight(0);
+			pLight->SetRadius(pLight->GetRadius() - 10.0f);*/
+
+			MainCamera->SetNearPlane(MainCamera->GetNearPlane() - 10.0f);
 		}
 
 		MainCamera->SetPosition(currentPosition);

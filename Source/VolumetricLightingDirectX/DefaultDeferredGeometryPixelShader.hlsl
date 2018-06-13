@@ -21,7 +21,7 @@ PS_OUTPUT main(VS_OUTPUT Input)
 	PS_OUTPUT output = (PS_OUTPUT)0;
 
 	output.Color = ColorTexture.Sample(Sampler, Input.TextureCoordinate);
-	output.Normal = float4(Input.Normal.xyz, 1.0f);
+	output.Normal = normalize(float4(Input.Normal, 0.0f));
 	output.WorldPosition = Input.WorldPosition;
 
 	return output;

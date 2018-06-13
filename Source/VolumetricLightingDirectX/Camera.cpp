@@ -120,11 +120,13 @@ namespace Rendering
 	void Camera::SetNearPlane(float nearPlane)
 	{
 		NearPlane = nearPlane;
+		InitializePerspectiveProjectionMatrix();
 	}
 
 	void Camera::SetFarPlane(float farPlane)
 	{
 		FarPlane = farPlane;
+		InitializePerspectiveProjectionMatrix();
 	}
 
 	float Camera::GetNearPlane() const

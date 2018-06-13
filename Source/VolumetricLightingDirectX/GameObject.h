@@ -40,8 +40,8 @@ namespace Rendering
 		void SetScale(const DirectX::XMFLOAT3& scale);
 		void SetTransform(const Transform& transform);
 
-		DirectX::XMMATRIX GetWorldMatrix();
-		DirectX::XMFLOAT4X4 GetWorldMatrixAsFloat4x4();
+		virtual DirectX::XMMATRIX GetWorldMatrix();
+		virtual DirectX::XMFLOAT4X4 GetWorldMatrixAsFloat4x4();
 
 		virtual void Update(Scene* currentScene);
 		virtual void Draw(std::shared_ptr<Direct3D>& direct3DRenderer, Scene* currentScene, DirectX::XMMATRIX viewProjectionMatrix);

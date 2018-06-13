@@ -24,9 +24,9 @@ VS_OUTPUT main(VS_INPUT IN)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	Output.Position = mul(IN.Position, WorldViewProjectionMatrix);
-	Output.WorldPosition = IN.Position;
+	Output.WorldPosition = mul(IN.Position, WorldMatrix);
 	Output.TextureCoordinate = IN.TextureCoordinate;
-	Output.Normal = IN.Normal;
+	Output.Normal = normalize(mul(float4(IN.Normal, 0.0f), WorldMatrix).xyz);
 
 	return Output;
 }

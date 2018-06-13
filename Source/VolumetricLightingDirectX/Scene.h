@@ -6,6 +6,8 @@
 #include "LightManager.h"
 #include "GBuffer.h"
 #include "ScreenQuad.h"
+#include "PostProcessing.h"
+#include "SkyBox.h"
 
 namespace Rendering
 {
@@ -42,14 +44,17 @@ namespace Rendering
 
 	private:
 		void HandleInput();
+		void AddPostProcessingEffects(ID3D11Device2* device);
 
 		SceneManager& SceneManagerReference;
 		std::vector<std::shared_ptr<GameObject>> GameObjectList;
+		std::vector <std::shared_ptr<PostProcessing>> PostProcessList;
 		
 		std::shared_ptr<Camera> MainCamera;
 		std::shared_ptr<LightManager> Lights;
 		std::shared_ptr<GBuffer> GBuffer1;
 		std::shared_ptr<ScreenQuad> ScreenQuad1;
+		std::shared_ptr<SkyBox> SceneSkyBox;
 
 		std::shared_ptr<Shader> DefaultVertexShader;
 		std::shared_ptr<Shader> DefaultPixelShader;

@@ -4,11 +4,13 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "Texture.h"
+#include "FXAA.h"
 
 namespace Rendering
 {
 	Scene::Scene(SceneManager& sceneManagerReference) : SceneManagerReference(sceneManagerReference), MainCamera(std::make_shared<Camera>(sceneManagerReference.GetRenderer()->GetScreenWidth(), sceneManagerReference.GetRenderer()->GetScreenHeight())), Lights(std::make_shared<LightManager>(SceneManagerReference.GetRenderer()->GetDevice())),
-														GBuffer1(std::make_shared<GBuffer>(sceneManagerReference.GetRenderer())), ScreenQuad1(std::make_shared<ScreenQuad>(sceneManagerReference.GetRenderer()->GetDevice()))
+														GBuffer1(std::make_shared<GBuffer>(sceneManagerReference.GetRenderer())), ScreenQuad1(std::make_shared<ScreenQuad>(sceneManagerReference.GetRenderer()->GetDevice())),
+														SceneSkyBox(std::make_shared<SkyBox>(sceneManagerReference.GetRenderer()->GetDevice(), *MainCamera, L"Content\\Textures\\SkyBoxTest.dds", Texture::TextureFileType::DDS))
 	{
 		InitializeScene();
 	}
@@ -41,6 +43,8 @@ namespace Rendering
 		constantBufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 		device->CreateBuffer(&constantBufferDescription, nullptr, VSCBufferPerObject.GetAddressOf());
+
+		AddPostProcessingEffects(device);
 
 		// Bistro Start
 
@@ -152,6 +156,8 @@ namespace Rendering
 		{
 			gameObject->Update(this);
 		}
+
+		SceneSkyBox->Update(this);
 	}
 
 	void Scene::HandleInput()
@@ -194,18 +200,18 @@ namespace Rendering
 
 		if (inputMap.at(InputManager::InputActions::IncreaseAttribute))
 		{
-			/*auto& pLight = Lights->GetPointLight(0);
-			pLight->SetRadius(pLight->GetRadius() + 10.0f);*/
+			auto& pLight = Lights->GetPointLight(0);
+			pLight->SetRadius(pLight->GetRadius() + 10.0f);
 			
-			MainCamera->SetNearPlane(MainCamera->GetNearPlane() +10.0f);
+			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() +10.0f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseAttribute))
 		{
-			/*auto& pLight = Lights->GetPointLight(0);
-			pLight->SetRadius(pLight->GetRadius() - 10.0f);*/
+			auto& pLight = Lights->GetPointLight(0);
+			pLight->SetRadius(pLight->GetRadius() - 10.0f);
 
-			MainCamera->SetNearPlane(MainCamera->GetNearPlane() - 10.0f);
+			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() - 10.0f);
 		}
 
 		MainCamera->SetPosition(currentPosition);
@@ -243,6 +249,13 @@ namespace Rendering
 		MainCamera->SetRotation(currentRotation);*/
 	}
 
+	void Scene::AddPostProcessingEffects(ID3D11Device2* device)
+	{
+		std::shared_ptr<FXAA> PostProcessFXAA = std::make_shared<FXAA>(device, ScreenQuad1);
+		PostProcessFXAA->SetScreenResolution(SceneManagerReference.GetRenderer()->GetScreenWidth(), SceneManagerReference.GetRenderer()->GetScreenHeight());;
+		PostProcessList.push_back(PostProcessFXAA);
+	}
+
 	void Scene::DrawScene(std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
@@ -268,8 +281,8 @@ namespace Rendering
 			gameObject->Draw(direct3DRenderer, this , viewProjectionMatrix);
 		}
 
-		direct3DRenderer->SetSingleRenderTarget();
-		direct3DRenderer->DisableDepthTesting();
+		direct3DRenderer->SetSceneBufferRenderTarget();
+		direct3DRenderer->DisableDepthWriting();
 		direct3DRenderer->BeginAdditiveBlending();
 
 		ScreenQuad1->BindScreenQuadVertexShader(deviceContext);
@@ -284,11 +297,16 @@ namespace Rendering
 		Lights->RenderPointLights(this, direct3DRenderer, viewProjectionMatrix);
 
 		direct3DRenderer->DisableBlending();
-		direct3DRenderer->EnableDepthTesting();
-		
-
 		GBuffer1->UnBindBufferData(deviceContext);
-		
+
+		SceneSkyBox->Draw(direct3DRenderer, this, viewProjectionMatrix);
+
+		for (auto& postProcess : PostProcessList)
+		{
+			postProcess->ApplyPostProcessing(direct3DRenderer);
+		}
+
+		direct3DRenderer->EnableDepthTesting();
 	}
 
 	void Scene::AddGameObject(std::shared_ptr<GameObject> gameObject)

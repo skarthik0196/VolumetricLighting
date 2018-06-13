@@ -7,7 +7,7 @@
 
 namespace Rendering
 {
-	LightManager::LightManager(ID3D11Device2* device) : AmbientLight(std::make_shared<Light>()), DLight(std::make_shared<DirectionalLight>()), DirectionalLightPixelShader(std::make_shared<Shader>(L"PostProcessingPixelShader.cso", Shader::ShaderType::PixelShader, device)),
+	LightManager::LightManager(ID3D11Device2* device) : AmbientLight(std::make_shared<Light>()), DLight(std::make_shared<DirectionalLight>()), DirectionalLightPixelShader(std::make_shared<Shader>(L"DirectionalLightPixelShader.cso", Shader::ShaderType::PixelShader, device)),
 														PointLightPixelShader(std::make_shared<Shader>(L"PointLightPixelShader.cso", Shader::ShaderType::PixelShader, device)), PointLightVolume(std::make_shared<Model>(device, "Content\\Models\\Sphere.obj", true)),
 														PointLightVertexShader(std::make_shared<Shader>(L"PointLightVertexShader.cso", Shader::ShaderType::VertexShader, device))
 	{
@@ -104,6 +104,9 @@ namespace Rendering
 		deviceContext->PSSetConstantBuffers(0, 1, PointLightPSCBuffer.GetAddressOf());
 		deviceContext->VSSetConstantBuffers(0, 1, PointLightVSCBuffer.GetAddressOf());
 
+		direct3DRenderer->SetRasterizerState(Direct3D::RasterizerState::FrontFaceCulling);
+		direct3DRenderer->DisableDepthTesting();
+
 		for (uint32_t i = 0; i < PointLightList.size(); ++i)
 		{
 			UpdatePointLightCBufferData(i, viewProjectionMatrix);
@@ -111,6 +114,9 @@ namespace Rendering
 			deviceContext->UpdateSubresource(PointLightPSCBuffer.Get(), 0, nullptr, &PLightPSData, 0, 0);
 			deviceContext->DrawIndexed(indexCount, 0, 0);
 		}
+
+		direct3DRenderer->SetRasterizerState(Direct3D::RasterizerState::BackFaceCulling);
+		direct3DRenderer->DisableDepthWriting();
 	}
 
 	std::shared_ptr<PointLight> LightManager::CreatePointLight(const DirectX::XMFLOAT3 & position, const DirectX::XMFLOAT4 & color, float intensity, float radius)

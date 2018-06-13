@@ -22,9 +22,9 @@ namespace Rendering
 
 		HRESULT result;
 
-		result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(BackBuffer.GetAddressOf()));
+		result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(FrameTexture.GetAddressOf()));
 		D3D11_TEXTURE2D_DESC depthBufferDescription;
-		BackBuffer->GetDesc(&depthBufferDescription);
+		FrameTexture->GetDesc(&depthBufferDescription);
 
 		D3D11_TEXTURE2D_DESC depthStencilBufferDescription;
 		ZeroMemory(&depthStencilBufferDescription, sizeof(D3D11_TEXTURE2D_DESC));
@@ -77,14 +77,51 @@ namespace Rendering
 		depthStencilDescription.DepthEnable = true;
 		depthStencilDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		depthStencilDescription.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthDisabledState.ReleaseAndGetAddressOf());
+		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthWritingDisabledState.ReleaseAndGetAddressOf());
 
-		result = GetDevice()->CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf());
+		depthStencilDescription.DepthEnable = false;
+		result = Device->CreateDepthStencilState(&depthStencilDescription, DepthDisableState.ReleaseAndGetAddressOf());
+
+		result = GetDevice()->CreateRenderTargetView(FrameTexture.Get(), nullptr, FrameBuffer.GetAddressOf());
+
+		D3D11_TEXTURE2D_DESC sceneTextureDescription;
+		ZeroMemory(&sceneTextureDescription, sizeof(D3D11_TEXTURE2D_DESC));
+
+		sceneTextureDescription.Width = static_cast<uint32_t>(ScreenWidth);
+		sceneTextureDescription.Height = static_cast<uint32_t>(ScreenHeight);
+		sceneTextureDescription.MipLevels = MipLevels;
+		sceneTextureDescription.ArraySize = 1;
+		sceneTextureDescription.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		sceneTextureDescription.SampleDesc.Count = GetMultiSamplingCount();
+		sceneTextureDescription.SampleDesc.Quality = GetMultiSamplingQualityLevels() - 1;
+		sceneTextureDescription.Usage = D3D11_USAGE_DEFAULT;
+		sceneTextureDescription.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+		result = Device->CreateTexture2D(&sceneTextureDescription, nullptr, SceneTexture.ReleaseAndGetAddressOf());
+
+		D3D11_RENDER_TARGET_VIEW_DESC sceneTargetDescription;
+		ZeroMemory(&sceneTargetDescription, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
+
+		sceneTargetDescription.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		sceneTargetDescription.Format = sceneTextureDescription.Format;
+		sceneTargetDescription.Texture2D.MipSlice = 0;
+
+		result = Device->CreateRenderTargetView(SceneTexture.Get(), &sceneTargetDescription, SceneTarget.ReleaseAndGetAddressOf());
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC sceneResourceDescription;
+		ZeroMemory(&sceneResourceDescription, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+
+		sceneResourceDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		sceneResourceDescription.Format = sceneTextureDescription.Format;
+		sceneResourceDescription.Texture2D.MostDetailedMip = 0;
+		sceneResourceDescription.Texture2D.MipLevels = MipLevels;
+
+		result = Device->CreateShaderResourceView(SceneTexture.Get(), &sceneResourceDescription, SceneResource.ReleaseAndGetAddressOf());
 
 		CreateBlendStates();
-
+		CreateRasterizerStates();
 		EnableDepthTesting();
-		SetSingleRenderTarget();
+		SetFrameBufferRenderTarget();
 		CreateViewPort();
 	}
 
@@ -128,9 +165,29 @@ namespace Rendering
 		Device->CreateBlendState(&blendStateDescription, AdditiveBlendState.ReleaseAndGetAddressOf());
 	}
 
+	void Direct3D::CreateRasterizerStates()
+	{
+		D3D11_RASTERIZER_DESC rasterizerStateDescription;
+		ZeroMemory(&rasterizerStateDescription, sizeof(D3D11_RASTERIZER_DESC));
+
+		rasterizerStateDescription.CullMode = D3D11_CULL_FRONT;
+		rasterizerStateDescription.FillMode = D3D11_FILL_SOLID;
+		Device->CreateRasterizerState(&rasterizerStateDescription, FrontFaceCulling.ReleaseAndGetAddressOf());
+		
+		rasterizerStateDescription.CullMode = D3D11_CULL_BACK;
+		Device->CreateRasterizerState(&rasterizerStateDescription, BackFaceCulling.ReleaseAndGetAddressOf());
+
+		rasterizerStateDescription.CullMode = D3D11_CULL_NONE;
+		Device->CreateRasterizerState(&rasterizerStateDescription, DisableCulling.ReleaseAndGetAddressOf());
+
+		rasterizerStateDescription.CullMode = D3D11_CULL_BACK;
+		rasterizerStateDescription.FillMode = D3D11_FILL_WIREFRAME;
+		Device->CreateRasterizerState(&rasterizerStateDescription, WireFrameMode.ReleaseAndGetAddressOf());
+	}
+
 	void Direct3D::ClearRenderTarget(DirectX::XMFLOAT4 BGColor)
 	{
-		DeviceContext->ClearRenderTargetView(RenderTargetView.Get(), reinterpret_cast<const float*>(&BGColor));
+		DeviceContext->ClearRenderTargetView(FrameBuffer.Get(), reinterpret_cast<const float*>(&BGColor));
 	}
 
 	void Direct3D::ClearDepthStencilView()
@@ -148,9 +205,14 @@ namespace Rendering
 		VSync = vsyncStatus;
 	}
 
-	void Direct3D::SetSingleRenderTarget()
+	void Direct3D::SetFrameBufferRenderTarget()
 	{
-		DeviceContext->OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), DepthStencilView.Get());
+		DeviceContext->OMSetRenderTargets(1, FrameBuffer.GetAddressOf(), DepthStencilView.Get());
+	}
+
+	void Direct3D::SetSceneBufferRenderTarget()
+	{
+		DeviceContext->OMSetRenderTargets(1, SceneTarget.GetAddressOf(), DepthStencilView.Get());
 	}
 
 	void Direct3D::EnableDepthTesting()
@@ -163,9 +225,46 @@ namespace Rendering
 		return VSync;
 	}
 
+	void Direct3D::SetRasterizerState(RasterizerState cullMode)
+	{
+		switch (cullMode)
+		{
+			case RasterizerState::BackFaceCulling:
+			{
+				DeviceContext->RSSetState(BackFaceCulling.Get());
+				break;
+			}
+			case RasterizerState::FrontFaceCulling:
+			{
+				DeviceContext->RSSetState(FrontFaceCulling.Get());
+				break;
+			}
+			case RasterizerState::DisableCulling:
+			{
+				DeviceContext->RSSetState(DisableCulling.Get());
+				break;
+			}
+			case RasterizerState::WireFrame:
+			{
+				DeviceContext->RSSetState(WireFrameMode.Get());
+				break;
+			}
+			default:
+			{
+				DeviceContext->RSSetState(BackFaceCulling.Get());
+				break;
+			}
+		}
+	}
+
+	void Direct3D::DisableDepthWriting()
+	{
+		DeviceContext->OMSetDepthStencilState(DepthWritingDisabledState.Get(), 1);
+	}
+
 	void Direct3D::DisableDepthTesting()
 	{
-		DeviceContext->OMSetDepthStencilState(DepthDisabledState.Get(), 1);
+		DeviceContext->OMSetDepthStencilState(DepthDisableState.Get(), 1);
 	}
 
 	void Direct3D::BeginAdditiveBlending()
@@ -187,5 +286,14 @@ namespace Rendering
 	ID3D11DepthStencilView* Direct3D::GetDepthStencilView()
 	{
 		return DepthStencilView.Get();
+	}
+
+	ID3D11ShaderResourceView * Direct3D::GetSceneTextureResourceView()
+	{
+		return SceneResource.Get();
+	}
+	ID3D11ShaderResourceView ** Direct3D::GetAddressOfSceneTextureResourceView()
+	{
+		return SceneResource.GetAddressOf();
 	}
 }

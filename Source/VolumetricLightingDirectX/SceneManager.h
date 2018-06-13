@@ -2,7 +2,6 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "InputManager.h"
-
 namespace Rendering
 {
 	class SceneManager

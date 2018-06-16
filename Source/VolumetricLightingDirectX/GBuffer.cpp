@@ -65,18 +65,23 @@ namespace Rendering
 		}
 	}
 
-	void GBuffer::SetRenderTargets(std::shared_ptr<Direct3D> direct3DRenderer)
+	void GBuffer::SetAllRenderTargets(std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
-		ID3D11RenderTargetView* renderTargetViews[] = { RenderTargetViews[0].Get(), RenderTargetViews[1].Get(), RenderTargetViews[2].Get() };
+		ID3D11RenderTargetView* renderTargetViews[] = { RenderTargetViews[0].Get(), RenderTargetViews[1].Get(), RenderTargetViews[2].Get(), RenderTargetViews[3].Get() };
 		direct3DRenderer->GetDeviceContext()->OMSetRenderTargets(static_cast<uint32_t>(RenderTargetViews.size()), renderTargetViews, direct3DRenderer->GetDepthStencilView());
 	}
 
-	void GBuffer::ClearRenderTargets(std::shared_ptr<Direct3D> direct3DRenderer)
+	void GBuffer::ClearAllRenderTargets(std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		for (uint32_t i = 0; i < RenderTargetViews.size(); ++i)
 		{
 			direct3DRenderer->GetDeviceContext()->ClearRenderTargetView(RenderTargetViews[i].Get(), reinterpret_cast<float*>(&Utility::BackgroundColor));
 		}
+	}
+
+	void GBuffer::SetRenderTarget(GBufferData type, std::shared_ptr<Direct3D>& direct3DRenderer)
+	{
+		direct3DRenderer->GetDeviceContext()->OMSetRenderTargets(1, RenderTargetViews[static_cast<uint32_t>(type)].GetAddressOf(), direct3DRenderer->GetDepthStencilView());
 	}
 
 	ID3D11ShaderResourceView* GBuffer::GetShaderResourceView(GBufferData resourceType)
@@ -91,13 +96,13 @@ namespace Rendering
 
 	void GBuffer::BindGBufferData(ID3D11DeviceContext2 * deviceContext)
 	{
-		ID3D11ShaderResourceView* shaderResourceViews[] = { ShaderResourceViews[0].Get(), ShaderResourceViews[1].Get(), ShaderResourceViews[2].Get() };
+		ID3D11ShaderResourceView* shaderResourceViews[] = { ShaderResourceViews[0].Get(), ShaderResourceViews[1].Get(), ShaderResourceViews[2].Get(), ShaderResourceViews[3].Get() };
 		deviceContext->PSSetShaderResources(0, ARRAYSIZE(shaderResourceViews), shaderResourceViews);
 	}
 
 	void GBuffer::UnBindBufferData(ID3D11DeviceContext2 * deviceContext)
 	{
-		ID3D11ShaderResourceView* shaderResourceViews[] = { nullptr, nullptr, nullptr };
+		ID3D11ShaderResourceView* shaderResourceViews[] = { nullptr, nullptr, nullptr, nullptr };
 		deviceContext->PSSetShaderResources(0, ARRAYSIZE(shaderResourceViews), shaderResourceViews);
 	}
 }

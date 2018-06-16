@@ -24,9 +24,23 @@ namespace Rendering
 		DirectX::XMVECTOR GetDirectionToLight() const;
 		DirectX::XMFLOAT3 GetDirectionToLightAsFloat3() const;
 
+		void SetSourcePosition(const DirectX::XMFLOAT3& position);
+		const DirectX::XMFLOAT3& GetSourcePosition() const;
+		
+		void SetSourceScale(const DirectX::XMFLOAT3 scale);
+		const DirectX::XMFLOAT3& GetSourceScale() const;
+
+		const DirectX::XMFLOAT4X4& GetWorldMatrix() const;
+
 	private:
+		void UpdateWorldMatrix();
+		DirectX::XMFLOAT4X4 WorldMatrix;
+
 		DirectX::XMFLOAT3 Direction;
 		DirectX::XMFLOAT3 UpVector;
 		DirectX::XMFLOAT3 RightVector;
+
+		DirectX::XMFLOAT3 SourcePosition{ DirectX::XMFLOAT3(0.0f,0.0f,0.0f) };
+		DirectX::XMFLOAT3 SourceScale{ DirectX::XMFLOAT3(10.0f,10.0f,10.0f) };
 	};
 }

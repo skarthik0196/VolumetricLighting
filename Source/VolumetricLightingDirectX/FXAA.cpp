@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "FXAA.h"
 #include "Shader.h"
+#include "Scene.h"
 
 namespace Rendering
 {
@@ -14,8 +15,10 @@ namespace Rendering
 		InitializeFXAA(device);
 	}
 
-	void FXAA::ApplyPostProcessing(std::shared_ptr<Direct3D> direct3DRenderer)
+	void FXAA::ApplyPostProcessing(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
+		UNREFERENCED_PARAMETER(scene);
+
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
 		direct3DRenderer->SetFrameBufferRenderTarget();
@@ -30,9 +33,6 @@ namespace Rendering
 			deviceContext->UpdateSubresource(PSCBuffer.Get(), 0, nullptr, &PSData, 0, 0);
 			NeedsBufferUpdate = false;
 		}
-
-
-
 		ScreenQuadData->DrawScreenQuad(deviceContext);
 	}
 

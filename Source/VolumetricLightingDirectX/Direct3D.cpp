@@ -188,6 +188,7 @@ namespace Rendering
 	void Direct3D::ClearRenderTarget(DirectX::XMFLOAT4 BGColor)
 	{
 		DeviceContext->ClearRenderTargetView(FrameBuffer.Get(), reinterpret_cast<const float*>(&BGColor));
+		DeviceContext->ClearRenderTargetView(SceneTarget.Get(), reinterpret_cast<const float*>(&BGColor));
 	}
 
 	void Direct3D::ClearDepthStencilView()

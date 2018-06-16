@@ -29,8 +29,8 @@ float RGBToLuma(float3 rgb)
 float4 main(VS_OUTPUT Input) : SV_TARGET
 {
 	float4 OutputColor = (float4)0;
-	//OutputColor = SceneTexture.Sample(ColorSampler, Input.TextureCoordinate);
-	//return OutputColor;
+	OutputColor = SceneTexture.Sample(ColorSampler, Input.TextureCoordinate);
+	return OutputColor;
 
 	/*float2 InverseScreenSize = float2(1/ScreenResolution.x, 1/ScreenResolution.y);
 
@@ -236,15 +236,5 @@ float4 main(VS_OUTPUT Input) : SV_TARGET
 	bool finalResult = LumaResult2 < LumaMin || LumaResult2 > LumaMax;
 
 	OutputColor = lerp(float4(Result1, 1.0f), float4(Result2, 1.0f), finalResult);
-
-	//if (LumaResult2 < LumaMin || LumaResult2 > LumaMax)
-	//{
-	//	OutputColor = float4(Result1, 1.0);
-	//}
-	//else
-	//{
-	//	OutputColor = float4(Result2, 1.0);
-	//}
-
 	return OutputColor;
 }

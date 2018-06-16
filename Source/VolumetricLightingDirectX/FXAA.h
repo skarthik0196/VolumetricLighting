@@ -3,6 +3,7 @@
 
 namespace Rendering
 {
+	class Scene;
 	class FXAA : public PostProcessing
 	{
 	public:
@@ -16,7 +17,7 @@ namespace Rendering
 		FXAA(ID3D11Device2* device, std::shared_ptr<ScreenQuad> screenQuad);
 		virtual ~FXAA() = default;
 
-		void ApplyPostProcessing(std::shared_ptr<Direct3D> direct3DRenderer);
+		void ApplyPostProcessing(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 		void SetScreenResolution(float screenWidth, float screenHeight);
 
 	private:

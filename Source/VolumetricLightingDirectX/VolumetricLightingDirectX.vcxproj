@@ -191,6 +191,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BillboardedQuad.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CelestialBody.h" />
     <ClInclude Include="Direct3D.h" />
@@ -207,6 +208,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="PostProcessGodRays.h" />
     <ClInclude Include="PostProcessing.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
@@ -221,6 +223,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClInclude Include="VolumetricLightingDirectX.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BillboardedQuad.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CelestialBody.cpp" />
     <ClCompile Include="Direct3D.cpp" />
@@ -243,6 +246,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="PostProcessGodRays.cpp" />
     <ClCompile Include="PostProcessing.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
@@ -314,6 +318,12 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="LightSourcePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="PointLightPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -343,6 +353,22 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="PostProcessLightShaftsPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="RenderTexturePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="ScreenQuadVertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>

@@ -40,6 +40,8 @@ namespace Rendering
 
 		std::shared_ptr<Camera>& GetCamera();
 
+		std::shared_ptr<GBuffer>& GetGBuffer();
+
 		std::vector<std::shared_ptr<GameObject>>& GetGameObjectList();
 
 	private:

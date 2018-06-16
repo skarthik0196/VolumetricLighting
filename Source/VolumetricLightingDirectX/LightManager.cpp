@@ -4,12 +4,15 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Mesh.h"
+#include "GameObject.h"
+#include "Texture.h"
 
 namespace Rendering
 {
 	LightManager::LightManager(ID3D11Device2* device) : AmbientLight(std::make_shared<Light>()), DLight(std::make_shared<DirectionalLight>()), DirectionalLightPixelShader(std::make_shared<Shader>(L"DirectionalLightPixelShader.cso", Shader::ShaderType::PixelShader, device)),
 														PointLightPixelShader(std::make_shared<Shader>(L"PointLightPixelShader.cso", Shader::ShaderType::PixelShader, device)), PointLightVolume(std::make_shared<Model>(device, "Content\\Models\\Sphere.obj", true)),
-														PointLightVertexShader(std::make_shared<Shader>(L"PointLightVertexShader.cso", Shader::ShaderType::VertexShader, device))
+														PointLightVertexShader(std::make_shared<Shader>(L"PointLightVertexShader.cso", Shader::ShaderType::VertexShader, device)), LightSourceTexture(std::make_shared<Texture>(L"Content\\Textures\\LightSourceTexture.jpg", Texture::TextureFileType::WIC, Texture::TextureType::Diffuse)),
+														LightSourcePixelShader(std::make_shared<Shader>(L"LightSourcePixelShader.cso", Shader::ShaderType::PixelShader, device))
 	{
 		Initialize(device);
 	}
@@ -50,6 +53,8 @@ namespace Rendering
 		device->CreateBuffer(&constantBufferDescription, nullptr, PointLightVSCBuffer.ReleaseAndGetAddressOf());
 
 		UpdateDirectionalCBufferData();
+
+		LightSourceTexture->InitializeTexture(device);
 	}
 
 	void LightManager::BindDLightCBuffer(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer)
@@ -130,5 +135,45 @@ namespace Rendering
 	std::shared_ptr<PointLight>& LightManager::GetPointLight(uint32_t index)
 	{
 		return PointLightList[index];
+	}
+
+	void LightManager::RenderPointLightSourceToScreen(int pointLightIndex, Scene * scene, std::shared_ptr<Direct3D>& direct3DRenderer, const DirectX::XMMATRIX & viewProjectionMatrix)
+	{
+		scene;
+		pointLightIndex;
+		direct3DRenderer;
+		viewProjectionMatrix;
+	}
+
+	void LightManager::RenderDirectionalLightSourceToScreen(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer, const DirectX::XMMATRIX & viewProjectionMatrix)
+	{
+		scene;
+		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
+
+		DirectX::XMMATRIX worldMatrix = DirectX::XMLoadFloat4x4(&DLight->GetWorldMatrix());
+		DirectX::XMMATRIX WVP = worldMatrix * viewProjectionMatrix;
+
+		WVP = DirectX::XMMatrixTranspose(WVP);
+		worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
+
+		CBufferPerObject LightSourceCBuffer;
+		DirectX::XMStoreFloat4x4(&LightSourceCBuffer.WorldMatrix, worldMatrix);
+		DirectX::XMStoreFloat4x4(&LightSourceCBuffer.WorldViewProjectionMatrix, WVP);
+
+		uint32_t stride = sizeof(Vertex);
+		uint32_t offset = 0;
+
+		deviceContext->UpdateSubresource(scene->GetVSCBufferPerObject(), 0, nullptr, &LightSourceCBuffer, 0, 0);
+
+		auto& mesh = PointLightVolume->GetMeshes()[0];
+
+		deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
+		deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+		deviceContext->PSSetShader(LightSourcePixelShader->GetPixelShader(), 0, 0);
+		deviceContext->PSSetShaderResources(0, 1, LightSourceTexture->GetAddressOfShaderResourceView());
+		deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+
+		//direct3DRenderer->ClearDepthStencilView();
 	}
 }

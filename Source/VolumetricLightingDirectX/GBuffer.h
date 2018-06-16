@@ -14,6 +14,7 @@ namespace Rendering
 			TexturedColor,
 			Normal,
 			WorldPosition,
+			OcclusionMap,
 			End
 		};
 
@@ -22,8 +23,10 @@ namespace Rendering
 
 		void Initialize(std::shared_ptr<Direct3D> direct3DRenderer);
 
-		void SetRenderTargets(std::shared_ptr<Direct3D> direct3DRenderer);
-		void ClearRenderTargets(std::shared_ptr<Direct3D> direct3DRenderer);
+		void SetAllRenderTargets(std::shared_ptr<Direct3D>& direct3DRenderer);
+		void ClearAllRenderTargets(std::shared_ptr<Direct3D>& direct3DRenderer);
+
+		void SetRenderTarget(GBufferData type, std::shared_ptr<Direct3D>& direct3DRenderer);
 
 		ID3D11ShaderResourceView* GetShaderResourceView(GBufferData resourceType);
 		ID3D11ShaderResourceView** GetAddressOfShaderResourceView(GBufferData resourceType);

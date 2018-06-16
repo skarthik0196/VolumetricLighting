@@ -96,7 +96,13 @@
     <ClInclude Include="FXAA.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBox.h" />
+    <ClInclude Include="SkyBox.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardedQuad.h" />
+    <ClInclude Include="PostProcessGodRays.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -168,7 +174,13 @@
     <ClCompile Include="FXAA.cpp">
       <Filter>PostProcessing</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcessGodRays.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
+    <ClCompile Include="BillboardedQuad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -218,6 +230,15 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="SkyBoxPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="LightSourcePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PostProcessLightShaftsPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="RenderTexturePixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

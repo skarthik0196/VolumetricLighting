@@ -5,6 +5,7 @@
 #include "Material.h"
 #include "Texture.h"
 #include "FXAA.h"
+#include "PostProcessGodRays.h"
 
 namespace Rendering
 {
@@ -88,6 +89,9 @@ namespace Rendering
 			Lights->CreatePointLight(DirectX::XMFLOAT3((-750.0f + i*50.0f), distribution(randomengine), distribution(randomengine)), DirectX::XMFLOAT4(colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine)), 1.0f, 300.0f);
 		}
 
+		Lights->GetDirectionalLight()->SetSourcePosition(DirectX::XMFLOAT3(0.0f, 500.0f, 0.0f));
+		Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));
+
 		//Sponza End
 
 		//Solar System Begin
@@ -141,6 +145,11 @@ namespace Rendering
 	std::shared_ptr<Camera>& Scene::GetCamera()
 	{
 		return MainCamera;
+	}
+
+	std::shared_ptr<GBuffer>& Scene::GetGBuffer()
+	{
+		return GBuffer1;
 	}
 
 	std::vector<std::shared_ptr<GameObject>>& Scene::GetGameObjectList()
@@ -200,18 +209,21 @@ namespace Rendering
 
 		if (inputMap.at(InputManager::InputActions::IncreaseAttribute))
 		{
-			auto& pLight = Lights->GetPointLight(0);
-			pLight->SetRadius(pLight->GetRadius() + 10.0f);
+			//auto& pLight = Lights->GetPointLight(0);
+			//pLight->SetRadius(pLight->GetRadius() + 10.0f);
 			
 			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() +10.0f);
+
+			dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).GetExposure() + 0.0001f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseAttribute))
 		{
-			auto& pLight = Lights->GetPointLight(0);
-			pLight->SetRadius(pLight->GetRadius() - 10.0f);
+			//auto& pLight = Lights->GetPointLight(0);
+			//pLight->SetRadius(pLight->GetRadius() - 10.0f);
 
 			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() - 10.0f);
+			dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).GetExposure() - 0.0001f);
 		}
 
 		MainCamera->SetPosition(currentPosition);
@@ -251,6 +263,9 @@ namespace Rendering
 
 	void Scene::AddPostProcessingEffects(ID3D11Device2* device)
 	{
+		std::shared_ptr<PostProcessGodRays> LightShafts = std::make_shared<PostProcessGodRays>(SceneManagerReference.GetRenderer(), ScreenQuad1,L"PostProcessLightShaftsPixelShader.cso", Lights->GetDirectionalLight());
+		PostProcessList.push_back(LightShafts);
+
 		std::shared_ptr<FXAA> PostProcessFXAA = std::make_shared<FXAA>(device, ScreenQuad1);
 		PostProcessFXAA->SetScreenResolution(SceneManagerReference.GetRenderer()->GetScreenWidth(), SceneManagerReference.GetRenderer()->GetScreenHeight());;
 		PostProcessList.push_back(PostProcessFXAA);
@@ -260,12 +275,11 @@ namespace Rendering
 	{
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
-		GBuffer1->SetRenderTargets(direct3DRenderer);
-		GBuffer1->ClearRenderTargets(direct3DRenderer);
+		GBuffer1->ClearAllRenderTargets(direct3DRenderer);
 
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->VSSetShader(DefaultVertexShader->GetVertexShader(), 0, 0);
-		deviceContext->PSSetShader(DefaultPixelShader->GetPixelShader(), 0, 0);
+
 		deviceContext->IASetInputLayout(DefaultVertexShader->GetInputLayout());
 
 		deviceContext->VSSetConstantBuffers(0, 1, VSCBufferPerObject.GetAddressOf());
@@ -276,6 +290,11 @@ namespace Rendering
 
 		MainCamera->UpdateFrustum();
 
+		GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
+		Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);
+
+		GBuffer1->SetAllRenderTargets(direct3DRenderer);
+		deviceContext->PSSetShader(DefaultPixelShader->GetPixelShader(), 0, 0);
 		for (auto& gameObject : GameObjectList)
 		{
 			gameObject->Draw(direct3DRenderer, this , viewProjectionMatrix);
@@ -300,10 +319,11 @@ namespace Rendering
 		GBuffer1->UnBindBufferData(deviceContext);
 
 		SceneSkyBox->Draw(direct3DRenderer, this, viewProjectionMatrix);
+		direct3DRenderer->DisableDepthTesting();
 
 		for (auto& postProcess : PostProcessList)
 		{
-			postProcess->ApplyPostProcessing(direct3DRenderer);
+			postProcess->ApplyPostProcessing(this, direct3DRenderer);
 		}
 
 		direct3DRenderer->EnableDepthTesting();

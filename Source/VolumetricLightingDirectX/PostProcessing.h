@@ -6,6 +6,7 @@
 
 namespace Rendering
 {
+	class Scene;
 	class PostProcessing
 	{
 	public:
@@ -14,7 +15,7 @@ namespace Rendering
 
 		virtual ~PostProcessing() = default;
 
-		virtual void ApplyPostProcessing(std::shared_ptr<Direct3D> direct3DRenderer) = 0;
+		virtual void ApplyPostProcessing(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer) = 0;
 
 	protected:
 		std::shared_ptr<ScreenQuad> ScreenQuadData;

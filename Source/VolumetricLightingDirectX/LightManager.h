@@ -9,6 +9,7 @@ namespace Rendering
 	class Direct3D;
 	class Shader;
 	class Model;
+	class Texture;
 
 	class LightManager
 	{
@@ -58,6 +59,10 @@ namespace Rendering
 
 		std::shared_ptr<PointLight>& GetPointLight(uint32_t index);
 
+		void RenderPointLightSourceToScreen(int pointLightIndex, Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer, const DirectX::XMMATRIX& viewProjectionMatrix);
+
+		void RenderDirectionalLightSourceToScreen(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer, const DirectX::XMMATRIX& viewProjectionMatrix);
+
 
 	private:
 		void UpdatePointLightCBufferData(uint32_t index, const DirectX::XMMATRIX& viewProjectionMatrix);
@@ -70,6 +75,7 @@ namespace Rendering
 		std::shared_ptr<Light> AmbientLight;
 		std::vector<std::shared_ptr<PointLight>> PointLightList;
 		std::shared_ptr<Model> PointLightVolume;
+		std::shared_ptr<Texture> LightSourceTexture;
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> DLightCBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> PointLightPSCBuffer;
@@ -79,5 +85,7 @@ namespace Rendering
 
 		std::shared_ptr<Shader> PointLightVertexShader;
 		std::shared_ptr<Shader> PointLightPixelShader;
+
+		std::shared_ptr<Shader> LightSourcePixelShader;
 	};
 }

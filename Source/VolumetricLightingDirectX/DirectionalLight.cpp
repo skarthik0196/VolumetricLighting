@@ -5,7 +5,7 @@ namespace Rendering
 {
 	DirectionalLight::DirectionalLight(const DirectX::XMFLOAT4& color, float intensity) : Light(color, intensity), Direction(Utility::Forward), UpVector(Utility::Up), RightVector(Utility::Right)
 	{
-
+		UpdateWorldMatrix();
 	}
 
 	DirectX::XMVECTOR DirectionalLight::GetDirection() const
@@ -65,5 +65,37 @@ namespace Rendering
 	DirectX::XMFLOAT3 DirectionalLight::GetDirectionToLightAsFloat3() const
 	{
 		return DirectX::XMFLOAT3(-Direction.x, -Direction.y, Direction.z);
+	}
+
+	void DirectionalLight::SetSourcePosition(const DirectX::XMFLOAT3 & position)
+	{
+		SourcePosition = position;
+		UpdateWorldMatrix();
+	}
+
+	const DirectX::XMFLOAT3& DirectionalLight::GetSourcePosition() const
+	{
+		return SourcePosition;
+	}
+
+	void DirectionalLight::SetSourceScale(const DirectX::XMFLOAT3 scale)
+	{
+		SourceScale = scale;
+		UpdateWorldMatrix();
+	}
+
+	const DirectX::XMFLOAT3 & DirectionalLight::GetSourceScale() const
+	{
+		return SourceScale;
+	}
+
+	const DirectX::XMFLOAT4X4& DirectionalLight::GetWorldMatrix() const
+	{
+		return WorldMatrix;
+	}
+
+	void DirectionalLight::UpdateWorldMatrix()
+	{
+		DirectX::XMStoreFloat4x4(&WorldMatrix, DirectX::XMMatrixMultiply(DirectX::XMMatrixScaling(SourceScale.x, SourceScale.y, SourceScale.z), DirectX::XMMatrixTranslation(SourcePosition.x, SourcePosition.y, SourcePosition.z)));
 	}
 }

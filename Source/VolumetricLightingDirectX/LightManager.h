@@ -2,6 +2,7 @@
 #include <wrl.h>
 #include "DirectionalLight.h"
 #include "PointLight.h"
+#include "ShadowMap.h"
 
 namespace Rendering
 {
@@ -63,6 +64,8 @@ namespace Rendering
 
 		void RenderDirectionalLightSourceToScreen(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer, const DirectX::XMMATRIX& viewProjectionMatrix);
 
+		void CreateDirectionalLightShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer);
+		void RenderDirectionalLightShadowMap(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 
 	private:
 		void UpdatePointLightCBufferData(uint32_t index, const DirectX::XMMATRIX& viewProjectionMatrix);
@@ -85,7 +88,8 @@ namespace Rendering
 
 		std::shared_ptr<Shader> PointLightVertexShader;
 		std::shared_ptr<Shader> PointLightPixelShader;
-
 		std::shared_ptr<Shader> LightSourcePixelShader;
+
+		std::shared_ptr<ShadowMap> DirectionalLightShadowMap;
 	};
 }

@@ -32,8 +32,14 @@ namespace Rendering
 
 		const DirectX::XMFLOAT4X4& GetWorldMatrix() const;
 
+		DirectX::XMMATRIX GetViewProjectionMatrix();
+
 	private:
+		bool viewProjectionNeedsUpdate{ true };
+
 		void UpdateWorldMatrix();
+		void UpdateViewProjectionMatrix();
+
 		DirectX::XMFLOAT4X4 WorldMatrix;
 
 		DirectX::XMFLOAT3 Direction;
@@ -42,5 +48,8 @@ namespace Rendering
 
 		DirectX::XMFLOAT3 SourcePosition{ DirectX::XMFLOAT3(0.0f,0.0f,0.0f) };
 		DirectX::XMFLOAT3 SourceScale{ DirectX::XMFLOAT3(10.0f,10.0f,10.0f) };
+
+		DirectX::XMFLOAT4X4 ViewMatrix;
+		DirectX::XMFLOAT4X4 ProjectionMatrix;
 	};
 }

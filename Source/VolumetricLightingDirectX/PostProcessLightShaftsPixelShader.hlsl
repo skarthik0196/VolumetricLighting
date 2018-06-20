@@ -28,13 +28,13 @@ float4 main(VS_OUTPUT Input) : SV_TARGET
 	float2 DeltaTexCoord = TexCoord - LightPosition;
 	DeltaTexCoord = DeltaTexCoord / SAMPLES;
 
-	float3 Color = OcclusionMap.Sample(Sampler, TexCoord);
+	float3 Color = OcclusionMap.Sample(Sampler, TexCoord).rgb;
 	float IlluminationDecay = 1.0f;
 
 	for (int i = 0; i < SAMPLES; ++i)
 	{
 		TexCoord -= DeltaTexCoord;
-		float3 Sample = OcclusionMap.Sample(Sampler, TexCoord);
+		float3 Sample = OcclusionMap.Sample(Sampler, TexCoord).rgb;
 		Sample = Sample * IlluminationDecay * Weight;
 		Color += Sample;
 		IlluminationDecay *= Decay;

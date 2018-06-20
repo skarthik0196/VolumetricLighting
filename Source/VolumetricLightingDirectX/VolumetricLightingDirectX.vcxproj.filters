@@ -103,6 +103,7 @@
     <ClInclude Include="PostProcessGodRays.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -181,6 +182,7 @@
       <Filter>PostProcessing</Filter>
     </ClCompile>
     <ClCompile Include="BillboardedQuad.cpp" />
+    <ClCompile Include="ShadowMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -239,6 +241,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="RenderTexturePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

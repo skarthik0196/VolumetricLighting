@@ -54,6 +54,8 @@ namespace Rendering
 		DirectX::XMStoreFloat3(&RightVector, DirectX::XMVector3Cross(directionVector, upVector));
 		DirectX::XMStoreFloat3(&UpVector, upVector);
 		DirectX::XMStoreFloat3(&Direction, directionVector);
+
+		viewProjectionNeedsUpdate = true;
 	}
 
 	DirectX::XMVECTOR DirectionalLight::GetDirectionToLight() const
@@ -94,8 +96,32 @@ namespace Rendering
 		return WorldMatrix;
 	}
 
+	DirectX::XMMATRIX DirectionalLight::GetViewProjectionMatrix()
+	{
+		if (viewProjectionNeedsUpdate == true)
+		{
+			UpdateViewProjectionMatrix();
+			viewProjectionNeedsUpdate = false;
+		}
+		auto wvp = DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&ViewMatrix), DirectX::XMLoadFloat4x4(&ProjectionMatrix));
+		return wvp;
+	}
+
 	void DirectionalLight::UpdateWorldMatrix()
 	{
 		DirectX::XMStoreFloat4x4(&WorldMatrix, DirectX::XMMatrixMultiply(DirectX::XMMatrixScaling(SourceScale.x, SourceScale.y, SourceScale.z), DirectX::XMMatrixTranslation(SourcePosition.x, SourcePosition.y, SourcePosition.z)));
+	}
+
+	void DirectionalLight::UpdateViewProjectionMatrix()
+	{
+		//DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicLH(20, 20, 1.0f, 10000.0f));
+		DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookToLH(DirectX::XMVectorZero(), GetDirection(), DirectX::XMLoadFloat3(&Utility::Up)));
+		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicOffCenterLH(-5.0, 5.0f, -5.0f, 20.0f, 1.0f, 15.0f));
+
+		DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3(0.0f, 50.0f, 0.0f);
+		DirectX::XMFLOAT3 lookAt = DirectX::XMFLOAT3(0.0f, 50.0f, 1.0f);
+		//DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookToLH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&Utility::Forward), DirectX::XMLoadFloat3(&Utility::Up)));
+		DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookAtLH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&lookAt), DirectX::XMLoadFloat3(&Utility::Up)));
+		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45.0f), (1366.0f / 768.0f), 2.0f, 100.0f));
 	}
 }

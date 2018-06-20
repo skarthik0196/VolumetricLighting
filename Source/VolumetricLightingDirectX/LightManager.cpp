@@ -176,4 +176,15 @@ namespace Rendering
 
 		//direct3DRenderer->ClearDepthStencilView();
 	}
+
+	void LightManager::CreateDirectionalLightShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer)
+	{
+		DirectionalLightShadowMap = std::make_shared<ShadowMap>(direct3DRenderer, DLight);
+	}
+
+	void LightManager::RenderDirectionalLightShadowMap(Scene * scene, std::shared_ptr<Direct3D>& direct3DRenderer)
+	{
+		DirectionalLightShadowMap->RenderShadowMap(direct3DRenderer, scene);
+	}
+
 }

@@ -49,6 +49,8 @@ namespace Rendering
 		DirectX::XMFLOAT3 SourcePosition{ DirectX::XMFLOAT3(0.0f,0.0f,0.0f) };
 		DirectX::XMFLOAT3 SourceScale{ DirectX::XMFLOAT3(10.0f,10.0f,10.0f) };
 
+		DirectX::XMFLOAT3 ShadowMapPosition{ DirectX::XMFLOAT3(0.0f,1000.0f,0.0f) };
+
 		DirectX::XMFLOAT4X4 ViewMatrix;
 		DirectX::XMFLOAT4X4 ProjectionMatrix;
 	};

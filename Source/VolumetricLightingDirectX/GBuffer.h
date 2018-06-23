@@ -31,6 +31,8 @@ namespace Rendering
 		ID3D11ShaderResourceView* GetShaderResourceView(GBufferData resourceType);
 		ID3D11ShaderResourceView** GetAddressOfShaderResourceView(GBufferData resourceType);
 
+		std::vector<ID3D11ShaderResourceView*> GetAllShaderResourceViews();
+
 		void BindGBufferData(ID3D11DeviceContext2* deviceContext);
 		void UnBindBufferData(ID3D11DeviceContext2* deviceContext);
 

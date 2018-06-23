@@ -138,6 +138,11 @@ namespace Rendering
 					{
 						deviceContext->PSSetShaderResources(0, 1, textures[Texture::TextureType::Diffuse][0]->GetAddressOfShaderResourceView());
 					}
+					if (textures[Texture::TextureType::NormalMap].size() > 0)
+					{
+						int a;
+						a = 10;
+					}
 				}
 				deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 			}

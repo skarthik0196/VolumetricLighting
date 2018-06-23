@@ -114,14 +114,25 @@ namespace Rendering
 
 	void DirectionalLight::UpdateViewProjectionMatrix()
 	{
-		//DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicLH(20, 20, 1.0f, 10000.0f));
-		DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookToLH(DirectX::XMVectorZero(), GetDirection(), DirectX::XMLoadFloat3(&Utility::Up)));
-		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicOffCenterLH(-5.0, 5.0f, -5.0f, 20.0f, 1.0f, 15.0f));
+		//DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicLH(2048.0f, 2048.0f, 1.0f, 5000.0f));
+		using namespace DirectX;
+		auto position = GetDirectionToLight() * 4000;
 
-		DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3(0.0f, 50.0f, 0.0f);
-		DirectX::XMFLOAT3 lookAt = DirectX::XMFLOAT3(0.0f, 50.0f, 1.0f);
-		//DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookToLH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&Utility::Forward), DirectX::XMLoadFloat3(&Utility::Up)));
-		DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookAtLH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&lookAt), DirectX::XMLoadFloat3(&Utility::Up)));
-		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45.0f), (1366.0f / 768.0f), 2.0f, 100.0f));
+		auto viewMatrix = DirectX::XMMatrixLookAtLH(position, DirectX::XMVectorZero(), DirectX::XMLoadFloat3(&Utility::Up));
+		DirectX::XMStoreFloat4x4(&ViewMatrix, viewMatrix);
+
+		XMFLOAT3 sphereCenter;
+		XMStoreFloat3(&sphereCenter, DirectX::XMVector3TransformCoord(XMVectorZero(), viewMatrix));
+
+		float l = sphereCenter.x - 2000.0f;
+		float b = sphereCenter.y - 2000.0f;
+		float r = sphereCenter.x + 2000.0f;
+		float t = sphereCenter.y + 2000.0f;
+
+		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicOffCenterLH(l, r, b, t, 1.0f, 10000.0f));
+
+		//DirectX::XMFLOAT3 pos = DirectX::XMFLOAT3(0.0f, 3000.0f, -3000.0f);
+		//DirectX::XMStoreFloat4x4(&ViewMatrix, DirectX::XMMatrixLookToLH(DirectX::XMLoadFloat3(&pos), GetDirection(), GetUpVector()));
+		//DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45.0f), (2048 / 2048.0f), 1.0f, 5000.0f));
 	}
 }

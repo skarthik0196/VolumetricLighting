@@ -21,6 +21,8 @@ namespace Rendering
 		~ShadowMap() = default;
 		
 		void RenderShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer, Scene* currentScene);
+		
+		ID3D11ShaderResourceView* GetShaderResourceView();
 
 	private:
 		void Initialize(std::shared_ptr<Direct3D>& direct3DRenderer);
@@ -36,6 +38,8 @@ namespace Rendering
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> VSCBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> ShadowMapRasterizerState;
+		
+		D3D11_VIEWPORT ShadowMapViewPort;
 
 		std::shared_ptr<Shader> ShadowMapVertexShader;
 		std::shared_ptr<Shader> ShadowMapPixelShader;

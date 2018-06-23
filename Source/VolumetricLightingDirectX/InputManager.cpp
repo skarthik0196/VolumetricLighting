@@ -101,6 +101,42 @@ namespace Rendering
 			KeyPressMap[InputActions::DecreaseAttribute] = false;
 		}
 
+		if (kb.I)
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightRightIncrease] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightRightIncrease] = false;
+		}
+
+		if (kb.O)
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightRightDecrease] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightRightDecrease] = false;
+		}
+
+		if (kb.K)
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightUpIncrease] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightUpIncrease] = false;
+		}
+
+		if (kb.L)
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightUpDecrease] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::RotateDirectionalLightUpDecrease] = false;
+		}
+
 		MouseInput = DirectX::XMFLOAT3(static_cast<float>(mouse.y), static_cast<float>(mouse.x), 0.0f);
 
 		/*if (mouse.leftButton)

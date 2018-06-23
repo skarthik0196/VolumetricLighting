@@ -17,6 +17,7 @@ namespace Rendering
 	public:
 		struct DirectionalAmbientLightData
 		{
+			DirectX::XMFLOAT4X4 LightViewProjectionMatrix;
 			DirectX::XMFLOAT4 AmbientLightColor;
 			DirectX::XMFLOAT4 DirectionalLightColor;
 			DirectX::XMFLOAT3 DirectionalLightDirection;
@@ -66,6 +67,8 @@ namespace Rendering
 
 		void CreateDirectionalLightShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer);
 		void RenderDirectionalLightShadowMap(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
+
+		std::shared_ptr<ShadowMap>& GetDirectionalLightShadowMap();
 
 	private:
 		void UpdatePointLightCBufferData(uint32_t index, const DirectX::XMMATRIX& viewProjectionMatrix);

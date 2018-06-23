@@ -17,6 +17,10 @@ namespace Rendering
 			Down,
 			IncreaseAttribute,
 			DecreaseAttribute,
+			RotateDirectionalLightRightIncrease,
+			RotateDirectionalLightRightDecrease,
+			RotateDirectionalLightUpIncrease,
+			RotateDirectionalLightUpDecrease,
 			Reset
 		};
 

@@ -94,15 +94,21 @@ namespace Rendering
 		return ShaderResourceViews[static_cast<uint32_t>(resourceType)].GetAddressOf();;
 	}
 
+	std::vector<ID3D11ShaderResourceView*> GBuffer::GetAllShaderResourceViews()
+	{
+		std::vector<ID3D11ShaderResourceView*> shaderResourceViews{ ShaderResourceViews[0].Get(), ShaderResourceViews[1].Get(), ShaderResourceViews[2].Get() };
+		return shaderResourceViews;
+	}
+
 	void GBuffer::BindGBufferData(ID3D11DeviceContext2 * deviceContext)
 	{
-		ID3D11ShaderResourceView* shaderResourceViews[] = { ShaderResourceViews[0].Get(), ShaderResourceViews[1].Get(), ShaderResourceViews[2].Get(), ShaderResourceViews[3].Get() };
+		ID3D11ShaderResourceView* shaderResourceViews[] = { ShaderResourceViews[0].Get(), ShaderResourceViews[1].Get(), ShaderResourceViews[2].Get() };
 		deviceContext->PSSetShaderResources(0, ARRAYSIZE(shaderResourceViews), shaderResourceViews);
 	}
 
 	void GBuffer::UnBindBufferData(ID3D11DeviceContext2 * deviceContext)
 	{
-		ID3D11ShaderResourceView* shaderResourceViews[] = { nullptr, nullptr, nullptr, nullptr };
+		ID3D11ShaderResourceView* shaderResourceViews[] = { nullptr, nullptr, nullptr };
 		deviceContext->PSSetShaderResources(0, ARRAYSIZE(shaderResourceViews), shaderResourceViews);
 	}
 }

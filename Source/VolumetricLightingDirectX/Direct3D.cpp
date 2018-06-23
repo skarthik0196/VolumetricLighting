@@ -127,17 +127,15 @@ namespace Rendering
 
 	void Direct3D::CreateViewPort()
 	{
-		D3D11_VIEWPORT viewPortDescription;
-		ZeroMemory(&viewPortDescription, sizeof(viewPortDescription));
 
-		viewPortDescription.TopLeftX = 0;
-		viewPortDescription.TopLeftY = 0;
-		viewPortDescription.Width = static_cast<float>(ScreenWidth);
-		viewPortDescription.Height = static_cast<float>(ScreenHeight);
-		viewPortDescription.MinDepth = 0;
-		viewPortDescription.MaxDepth = 1;
+		RendererViewPort.TopLeftX = 0;
+		RendererViewPort.TopLeftY = 0;
+		RendererViewPort.Width = static_cast<float>(ScreenWidth);
+		RendererViewPort.Height = static_cast<float>(ScreenHeight);
+		RendererViewPort.MinDepth = 0;
+		RendererViewPort.MaxDepth = 1;
 
-		DeviceContext->RSSetViewports(1, &viewPortDescription);
+		DeviceContext->RSSetViewports(1, &RendererViewPort);
 	}
 
 	void Direct3D::CreateBlendStates()
@@ -282,6 +280,11 @@ namespace Rendering
 	{
 		
 		DeviceContext->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
+	}
+
+	void Direct3D::SetViewPort()
+	{
+		DeviceContext->RSSetViewports(1, &RendererViewPort);
 	}
 
 	ID3D11DepthStencilView* Direct3D::GetDepthStencilView()

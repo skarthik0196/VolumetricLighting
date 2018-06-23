@@ -49,7 +49,7 @@ namespace Rendering
 
 		// Bistro Start
 
-		MainCamera->Rotate(MainCamera->GetRightVectorN(), -90.0f);
+		/*MainCamera->Rotate(MainCamera->GetRightVectorN(), -90.0f);
 		MainCamera->Move(DirectX::XMFLOAT3(-750.0f, 0.0, -500.0f));
 
 		Lights->GetAmbientLight()->SetIntensity(0.5f);
@@ -70,31 +70,32 @@ namespace Rendering
 
 
 		Lights->GetDirectionalLight()->SetSourcePosition(DirectX::XMFLOAT3(-3000.0f, -1000.0f, -5000.0f));
-		Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));
+		Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));*/
+
 		//Bistro End
 
 		//Sponza Start
 
-		//MainCamera->Move(DirectX::XMFLOAT3(30.0f, 100.0f, 0.0f));
-		//MainCamera->Rotate(MainCamera->GetUpVector(), 90.0f);
+		MainCamera->Move(DirectX::XMFLOAT3(30.0f, 100.0f, 0.0f));
+		MainCamera->Rotate(MainCamera->GetUpVector(), 90.0f);
 
-		//Lights->GetAmbientLight()->SetIntensity(0.2f);
-		//Lights->GetDirectionalLight()->SetIntensity(0.5f);
-		//Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 30);
+		Lights->GetAmbientLight()->SetIntensity(0.2f);
+		Lights->GetDirectionalLight()->SetIntensity(1.0f);
+		Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 75.0f);
 
-		//Lights->CreatePointLight(DirectX::XMFLOAT3(0.0f, 30.0f, 50.0f), Utility::Red, 1.0f, 150.0f);
+		Lights->CreatePointLight(DirectX::XMFLOAT3(0.0f, 30.0f, 50.0f), Utility::Red, 1.0f, 150.0f);
 
-		//std::uniform_real_distribution<float> distribution(-250.0f, 250.0f);
-		//std::uniform_real_distribution<float> colordistribution(0, 1);
-		//std::default_random_engine randomengine;
+		std::uniform_real_distribution<float> distribution(-250.0f, 250.0f);
+		std::uniform_real_distribution<float> colordistribution(0, 1);
+		std::default_random_engine randomengine;
 
-		//for (uint32_t i = 0; i < 40; ++i)
-		//{
-		//	Lights->CreatePointLight(DirectX::XMFLOAT3((-750.0f + i*50.0f), distribution(randomengine), distribution(randomengine)), DirectX::XMFLOAT4(colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine)), 1.0f, 300.0f);
-		//}
+		for (uint32_t i = 0; i < 40; ++i)
+		{
+			Lights->CreatePointLight(DirectX::XMFLOAT3((-750.0f + i*50.0f), distribution(randomengine), distribution(randomengine)), DirectX::XMFLOAT4(colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine)), 1.0f, 300.0f);
+		}
 
-		//Lights->GetDirectionalLight()->SetSourcePosition(DirectX::XMFLOAT3(0.0f, 500.0f, 0.0f));
-		//Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));
+		Lights->GetDirectionalLight()->SetSourcePosition(DirectX::XMFLOAT3(0.0f, 500.0f, 0.0f));
+		Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));
 
 		//Sponza End
 
@@ -214,7 +215,9 @@ namespace Rendering
 
 			//dLight->SetSourcePosition(DirectX::XMFLOAT3(sourcePosition.x , sourcePosition.y , sourcePosition.z + 10.0f));
 
-			dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).GetExposure() + 0.0001f);
+			//dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).GetExposure() + 0.0001f);
+
+			Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 0.2f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseAttribute))
@@ -229,7 +232,29 @@ namespace Rendering
 
 			//dLight->SetSourcePosition(DirectX::XMFLOAT3(sourcePosition.x , sourcePosition.y , sourcePosition.z - 10.0f));
 
-			dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).GetExposure() - 0.0001f);
+			//dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[0]).GetExposure() - 0.0001f);
+
+			Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, -0.2f);
+		}
+
+		if (inputMap.at(InputManager::InputActions::RotateDirectionalLightRightIncrease))
+		{
+			Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 0.2f);
+		}
+
+		if (inputMap.at(InputManager::InputActions::RotateDirectionalLightRightDecrease))
+		{
+			Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, -0.2f);
+		}
+
+		if (inputMap.at(InputManager::InputActions::RotateDirectionalLightUpIncrease))
+		{
+			Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, 0.2f);
+		}
+
+		if (inputMap.at(InputManager::InputActions::RotateDirectionalLightUpDecrease))
+		{
+			Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, -0.2f);
 		}
 
 		MainCamera->SetPosition(currentPosition);
@@ -285,7 +310,9 @@ namespace Rendering
 
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		//Lights->RenderDirectionalLightShadowMap(this, direct3DRenderer);
+		Lights->RenderDirectionalLightShadowMap(this, direct3DRenderer);
+
+		direct3DRenderer->SetViewPort();
 
 		deviceContext->VSSetShader(DefaultVertexShader->GetVertexShader(), 0, 0);
 
@@ -314,12 +341,17 @@ namespace Rendering
 		direct3DRenderer->BeginAdditiveBlending();
 
 		ScreenQuad1->BindScreenQuadVertexShader(deviceContext);
-		GBuffer1->BindGBufferData(deviceContext);
+		//GBuffer1->BindGBufferData(deviceContext);
+		auto shaderResources = GBuffer1->GetAllShaderResourceViews();
+
+		shaderResources.push_back(Lights->GetDirectionalLightShadowMap()->GetShaderResourceView());
+		deviceContext->PSSetShaderResources(0, static_cast<uint32_t>(shaderResources.size()), shaderResources.data());
 
 		deviceContext->PSSetShader(Lights->GetDirectionalLightPixelShader()->GetPixelShader(), 0, 0);
 		Lights->BindDLightCBuffer(this, direct3DRenderer);
 		ScreenQuad1->DrawScreenQuad(deviceContext);
 
+		GBuffer1->BindGBufferData(deviceContext);
 		direct3DRenderer->EnableAdditiveBlending();
 
 		Lights->RenderPointLights(this, direct3DRenderer, viewProjectionMatrix);

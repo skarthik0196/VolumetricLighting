@@ -60,6 +60,9 @@ namespace Rendering
 	void LightManager::BindDLightCBuffer(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		DirectionalLightData.CameraPosition = scene->GetCamera()->GetPositionAsFloat3();
+		DirectX::XMStoreFloat4x4(&DirectionalLightData.LightViewProjectionMatrix, DirectX::XMMatrixTranspose(scene->GetLightManager()->GetDirectionalLight()->GetViewProjectionMatrix()));
+
+		UpdateDirectionalCBufferData();
 
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 		deviceContext->UpdateSubresource(DLightCBuffer.Get(), 0, nullptr, &DirectionalLightData, 0, 0);
@@ -185,6 +188,11 @@ namespace Rendering
 	void LightManager::RenderDirectionalLightShadowMap(Scene * scene, std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		DirectionalLightShadowMap->RenderShadowMap(direct3DRenderer, scene);
+	}
+
+	std::shared_ptr<ShadowMap>& LightManager::GetDirectionalLightShadowMap()
+	{
+		return DirectionalLightShadowMap;
 	}
 
 }

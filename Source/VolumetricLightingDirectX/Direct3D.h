@@ -40,6 +40,8 @@ namespace Rendering
 		void EnableAdditiveBlending();
 		void DisableBlending();
 
+		void SetViewPort();
+
 		bool GetVSyncStatus();
 
 		void SetRasterizerState(RasterizerState cullMode);
@@ -52,6 +54,8 @@ namespace Rendering
 		void CreateViewPort();
 		void CreateBlendStates();
 		void CreateRasterizerStates();
+
+		D3D11_VIEWPORT RendererViewPort;
 
 		uint32_t MipLevels;
 		bool VSync;
@@ -77,5 +81,7 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> BackFaceCulling;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> DisableCulling;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> WireFrameMode;
+
+		
 	};
 }

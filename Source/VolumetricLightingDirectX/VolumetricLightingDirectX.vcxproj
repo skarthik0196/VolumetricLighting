@@ -201,6 +201,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClInclude Include="FXAA.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="HDRToneMapping.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />
@@ -234,6 +235,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClCompile Include="FXAA.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GBuffer.cpp" />
+    <ClCompile Include="HDRToneMapping.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightManager.cpp" />
@@ -319,6 +321,12 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HDRPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="LightSourcePixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

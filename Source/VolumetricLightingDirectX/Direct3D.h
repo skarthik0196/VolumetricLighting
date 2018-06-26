@@ -31,6 +31,7 @@ namespace Rendering
 		void SetVSync(bool vsyncStatus);
 		void SetFrameBufferRenderTarget();
 		void SetSceneBufferRenderTarget();
+		void SetToneMappingRenderTarget();
 
 		void EnableDepthTesting();
 		void DisableDepthWriting();
@@ -50,6 +51,9 @@ namespace Rendering
 		ID3D11ShaderResourceView* GetSceneTextureResourceView();
 		ID3D11ShaderResourceView** GetAddressOfSceneTextureResourceView();
 
+		ID3D11ShaderResourceView* GetToneMappedTextureResouceView();
+		ID3D11ShaderResourceView** GetAddressOfToneMappedTextureResouceView();
+
 	private:
 		void CreateViewPort();
 		void CreateBlendStates();
@@ -63,8 +67,10 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> FrameTexture;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> DepthBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D>	SceneTexture;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> ToneMappedTexture;
 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> SceneResource;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ToneMappedResource;
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DepthEnabledState;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DepthWritingDisabledState;
@@ -73,6 +79,7 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> FrameBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> SceneTarget;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ToneMappedTarget;
 
 		Microsoft::WRL::ComPtr<ID3D11BlendState> FirstAdditiveBlendState;
 		Microsoft::WRL::ComPtr<ID3D11BlendState> AdditiveBlendState;

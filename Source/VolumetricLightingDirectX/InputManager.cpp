@@ -137,6 +137,51 @@ namespace Rendering
 			KeyPressMap[InputActions::RotateDirectionalLightUpDecrease] = false;
 		}
 
+		if (kb.D1)
+		{
+			KeyPressMap[InputActions::ToggleFXAA] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::ToggleFXAA] = false;
+		}
+
+		if (kb.D2)
+		{
+			KeyPressMap[InputActions::ToggleHDR] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::ToggleHDR] = false;
+		}
+
+		if (kb.D3)
+		{
+			KeyPressMap[InputActions::ToggleGammaCorrection] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::ToggleGammaCorrection] = false;
+		}
+
+		if (kb.G)
+		{
+			KeyPressMap[InputActions::IncreaseExposure] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::IncreaseExposure] = false;
+		}
+
+		if (kb.F)
+		{
+			KeyPressMap[InputActions::DecreaseExposure] = true;
+		}
+		else
+		{
+			KeyPressMap[InputActions::DecreaseExposure] = false;
+		}
+
 		MouseInput = DirectX::XMFLOAT3(static_cast<float>(mouse.y), static_cast<float>(mouse.x), 0.0f);
 
 		/*if (mouse.leftButton)

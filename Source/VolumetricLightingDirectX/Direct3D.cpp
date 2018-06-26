@@ -98,6 +98,7 @@ namespace Rendering
 		sceneTextureDescription.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
 		result = Device->CreateTexture2D(&sceneTextureDescription, nullptr, SceneTexture.ReleaseAndGetAddressOf());
+		result = Device->CreateTexture2D(&sceneTextureDescription, nullptr, ToneMappedTexture.ReleaseAndGetAddressOf());
 
 		D3D11_RENDER_TARGET_VIEW_DESC sceneTargetDescription;
 		ZeroMemory(&sceneTargetDescription, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
@@ -107,6 +108,7 @@ namespace Rendering
 		sceneTargetDescription.Texture2D.MipSlice = 0;
 
 		result = Device->CreateRenderTargetView(SceneTexture.Get(), &sceneTargetDescription, SceneTarget.ReleaseAndGetAddressOf());
+		result = Device->CreateRenderTargetView(ToneMappedTexture.Get(), &sceneTargetDescription, ToneMappedTarget.ReleaseAndGetAddressOf());
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC sceneResourceDescription;
 		ZeroMemory(&sceneResourceDescription, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -117,6 +119,7 @@ namespace Rendering
 		sceneResourceDescription.Texture2D.MipLevels = MipLevels;
 
 		result = Device->CreateShaderResourceView(SceneTexture.Get(), &sceneResourceDescription, SceneResource.ReleaseAndGetAddressOf());
+		result = Device->CreateShaderResourceView(ToneMappedTexture.Get(), &sceneResourceDescription, ToneMappedResource.ReleaseAndGetAddressOf());
 
 		CreateBlendStates();
 		CreateRasterizerStates();
@@ -214,6 +217,11 @@ namespace Rendering
 		DeviceContext->OMSetRenderTargets(1, SceneTarget.GetAddressOf(), DepthStencilView.Get());
 	}
 
+	void Direct3D::SetToneMappingRenderTarget()
+	{
+		DeviceContext->OMSetRenderTargets(1, ToneMappedTarget.GetAddressOf(), DepthStencilView.Get());
+	}
+
 	void Direct3D::EnableDepthTesting()
 	{
 		DeviceContext->OMSetDepthStencilState(DepthEnabledState.Get(), 1);
@@ -299,5 +307,15 @@ namespace Rendering
 	ID3D11ShaderResourceView ** Direct3D::GetAddressOfSceneTextureResourceView()
 	{
 		return SceneResource.GetAddressOf();
+	}
+
+	ID3D11ShaderResourceView * Direct3D::GetToneMappedTextureResouceView()
+	{
+		return ToneMappedResource.Get();
+	}
+
+	ID3D11ShaderResourceView ** Direct3D::GetAddressOfToneMappedTextureResouceView()
+	{
+		return ToneMappedResource.GetAddressOf();
 	}
 }

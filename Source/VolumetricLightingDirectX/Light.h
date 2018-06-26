@@ -13,10 +13,12 @@ namespace Rendering
 		void SetIntensity(float intensity);
 
 		const DirectX::XMFLOAT4& GetColor() const;
+		const DirectX::XMFLOAT4& GetBaseColor() const;
 		float GetIntensity() const;
 
 	private:
 
+		DirectX::XMFLOAT4 BaseColor;
 		DirectX::XMFLOAT4 Color;
 		float Intensity;
 	};

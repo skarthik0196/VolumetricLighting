@@ -103,7 +103,12 @@
     <ClInclude Include="PostProcessGodRays.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="ShadowMap.h">
+      <Filter>LightClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="HDRToneMapping.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -182,7 +187,12 @@
       <Filter>PostProcessing</Filter>
     </ClCompile>
     <ClCompile Include="BillboardedQuad.cpp" />
-    <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>LightClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="HDRToneMapping.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -247,6 +257,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="ShadowMapPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="HDRPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

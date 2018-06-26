@@ -5,12 +5,12 @@
 
 namespace Rendering
 {
-	FXAA::FXAA(ID3D11Device2* device) : PostProcessing(device, L"FXAAPixelShader.cso")
+	FXAA::FXAA(ID3D11Device2* device) : PostProcessing(device, L"RenderTexturePixelShader.cso"), FXAAPixelShader(std::make_shared<Shader>(L"FXAAPixelShader.cso", Shader::ShaderType::PixelShader, device)), FXAAEnabled(false)
 	{
 		InitializeFXAA(device);
 	}
 
-	FXAA::FXAA(ID3D11Device2* device, std::shared_ptr<ScreenQuad> screenQuad) : PostProcessing(device, screenQuad, L"FXAAPixelShader.cso")
+	FXAA::FXAA(ID3D11Device2* device, std::shared_ptr<ScreenQuad> screenQuad) : PostProcessing(device, screenQuad, L"RenderTexturePixelShader.cso"), FXAAPixelShader(std::make_shared<Shader>(L"FXAAPixelShader.cso", Shader::ShaderType::PixelShader, device)), FXAAEnabled(false)
 	{
 		InitializeFXAA(device);
 	}
@@ -24,8 +24,17 @@ namespace Rendering
 		direct3DRenderer->SetFrameBufferRenderTarget();
 
 		ScreenQuadData->BindScreenQuadVertexShader(deviceContext);
-		deviceContext->PSSetShader(PostProcessingPixelShader->GetPixelShader(), 0, 0);
-		deviceContext->PSSetShaderResources(0, 1, direct3DRenderer->GetAddressOfSceneTextureResourceView());
+
+		if (FXAAEnabled)
+		{
+			deviceContext->PSSetShader(FXAAPixelShader->GetPixelShader(), 0, 0);
+		}
+		else
+		{
+			deviceContext->PSSetShader(PostProcessingPixelShader->GetPixelShader(), 0, 0);
+		}
+
+		deviceContext->PSSetShaderResources(0, 1, direct3DRenderer->GetAddressOfToneMappedTextureResouceView());
 		deviceContext->PSSetConstantBuffers(0, 1, PSCBuffer.GetAddressOf());
 
 		if (NeedsBufferUpdate)
@@ -41,6 +50,16 @@ namespace Rendering
 		PSData.ScreenResolution.x = screenWidth;
 		PSData.ScreenResolution.y = screenHeight;
 		NeedsBufferUpdate = true;
+	}
+
+	void FXAA::ToggleFXAA()
+	{
+		FXAAEnabled = !FXAAEnabled;
+	}
+
+	bool FXAA::IsFXAAEnabled() const
+	{
+		return FXAAEnabled;
 	}
 
 	void FXAA::InitializeFXAA(ID3D11Device2* device)

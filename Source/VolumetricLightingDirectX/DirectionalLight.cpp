@@ -116,7 +116,7 @@ namespace Rendering
 	{
 		//DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicLH(2048.0f, 2048.0f, 1.0f, 5000.0f));
 		using namespace DirectX;
-		auto position = GetDirectionToLight() * 4000;
+		auto position = GetDirectionToLight() * 6000.0f;
 
 		auto viewMatrix = DirectX::XMMatrixLookAtLH(position, DirectX::XMVectorZero(), DirectX::XMLoadFloat3(&Utility::Up));
 		DirectX::XMStoreFloat4x4(&ViewMatrix, viewMatrix);
@@ -124,10 +124,10 @@ namespace Rendering
 		XMFLOAT3 sphereCenter;
 		XMStoreFloat3(&sphereCenter, DirectX::XMVector3TransformCoord(XMVectorZero(), viewMatrix));
 
-		float l = sphereCenter.x - 2000.0f;
-		float b = sphereCenter.y - 2000.0f;
-		float r = sphereCenter.x + 2000.0f;
-		float t = sphereCenter.y + 2000.0f;
+		float l = sphereCenter.x - 3000.0f;
+		float b = sphereCenter.y - 3000.0f;
+		float r = sphereCenter.x + 3000.0f;
+		float t = sphereCenter.y + 3000.0f;
 
 		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixOrthographicOffCenterLH(l, r, b, t, 1.0f, 10000.0f));
 

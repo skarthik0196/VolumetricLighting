@@ -29,7 +29,7 @@ float4 main( VS_INPUT Input ) : SV_TARGET
 	float3 Normal = (NormalTexture.Sample(Sampler, Input.TextureCoordinate)).xyz;
 	float4 LightProjectionPosition = mul(float4(WorldPosition, 1.0f), LightViewProjectionMatrix);
 
-	float DepthBias = 0.000f;
+	float DepthBias = 0.001f;
 	bool InLight = false;
 
 	float2 ProjectionCoordinates = ((LightProjectionPosition.xy / LightProjectionPosition.w)*0.5f) + 0.5f;

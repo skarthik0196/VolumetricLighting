@@ -29,8 +29,6 @@ float RGBToLuma(float3 rgb)
 float4 main(VS_OUTPUT Input) : SV_TARGET
 {
 	float4 OutputColor = (float4)0;
-	OutputColor = SceneTexture.Sample(ColorSampler, Input.TextureCoordinate);
-	return OutputColor;
 
 	/*float2 InverseScreenSize = float2(1/ScreenResolution.x, 1/ScreenResolution.y);
 

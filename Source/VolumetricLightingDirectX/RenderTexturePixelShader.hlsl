@@ -9,5 +9,6 @@ struct VS_OUTPUT
 
 float4 main(VS_OUTPUT Input) : SV_TARGET
 {
-	return Texture.Sample(Sampler, Input.TextureCoordinate);
+	float4 OutputColor = float4(Texture.Sample(Sampler, Input.TextureCoordinate).rgb,1.0f);
+	return OutputColor;
 }

@@ -19,11 +19,18 @@ namespace Rendering
 
 		void ApplyPostProcessing(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 		void SetScreenResolution(float screenWidth, float screenHeight);
+		void ToggleFXAA();
+
+		bool IsFXAAEnabled() const;
 
 	private:
 		void InitializeFXAA(ID3D11Device2* device);
 		FXAAPixelShaderData PSData;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> PSCBuffer;
 		bool NeedsBufferUpdate{ true };
+
+		bool FXAAEnabled;
+
+		std::shared_ptr<Shader> FXAAPixelShader;
 	};
 }

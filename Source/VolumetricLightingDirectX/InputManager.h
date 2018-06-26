@@ -17,10 +17,15 @@ namespace Rendering
 			Down,
 			IncreaseAttribute,
 			DecreaseAttribute,
+			IncreaseExposure,
+			DecreaseExposure,
 			RotateDirectionalLightRightIncrease,
 			RotateDirectionalLightRightDecrease,
 			RotateDirectionalLightUpIncrease,
 			RotateDirectionalLightUpDecrease,
+			ToggleFXAA,
+			ToggleHDR,
+			ToggleGammaCorrection,
 			Reset
 		};
 

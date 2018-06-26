@@ -74,7 +74,7 @@ namespace Rendering
 	void PostProcessGodRays::BlendLightShafts(std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
-		direct3DRenderer->SetSceneBufferRenderTarget();
+		direct3DRenderer->SetToneMappingRenderTarget();
 		direct3DRenderer->EnableAdditiveBlending();
 
 		deviceContext->PSSetShader(RenderTexturePixelShader->GetPixelShader(), 0, 0);

@@ -78,6 +78,11 @@ namespace Rendering
 
 		std::shared_ptr<Frustum>& GetFrustum();
 
+		const DirectX::XMFLOAT4X4& GetPartitionProjectionMatrixByIndexAsFloat4x4(uint32_t index) const;
+		DirectX::XMMATRIX GetPartitionProjectionMatrixByIndex(uint32_t index) const;
+
+		static const uint32_t& GetPartitionCount();
+
 	private:
 
 		DirectX::XMFLOAT3 Position;
@@ -91,11 +96,17 @@ namespace Rendering
 		DirectX::XMFLOAT4X4 ProjectionMatrix;
 		DirectX::XMFLOAT4X4 ViewProjectionMatrix;
 
+		DirectX::XMFLOAT4X4 ParitionViewMatrix[3];
+		DirectX::XMFLOAT4X4 PartitionProjectionMatrix[3];
+
 		float FieldOfView;
 		float NearPlane;
 		float FarPlane;
 		float ScreenWidth;
 		float ScreenHeight;
+
+		static const uint32_t PartitionCount = 3;
+		static const float PartitionDepth[];
 
 		std::shared_ptr<Frustum> CameraFrustum;
 	};

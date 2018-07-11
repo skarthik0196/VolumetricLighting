@@ -9,7 +9,7 @@ namespace Rendering
 	public:
 		struct FXAAPixelShaderData
 		{
-			DirectX::XMFLOAT2 ScreenResolution{ DirectX::XMFLOAT2(1366.0f,768.0f) };
+			DirectX::XMFLOAT2 NoiseScale{ DirectX::XMFLOAT2(1366.0f,768.0f) };
 			DirectX::XMFLOAT2 Padding;
 		};
 

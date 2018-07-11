@@ -4,6 +4,8 @@
 
 namespace Rendering
 {
+	const float Camera::PartitionDepth[]{ 1.0f, 25.0f, 100.0f, 1000.0f };
+
 	Camera::Camera(float screenWidth, float screenHeight, float nearPlane, float farPlane) : NearPlane(nearPlane), FarPlane(farPlane), Position(Utility::Zero), Target(Utility::Forward), RightVectorEndPoint(Utility::Right), Rotation(Utility::Zero), FieldOfView(45.0f), ScreenWidth(screenWidth), ScreenHeight(screenHeight),
 														CameraFrustum(std::make_shared<Frustum>())
 	{
@@ -179,8 +181,13 @@ namespace Rendering
 
 	void Camera::InitializePerspectiveProjectionMatrix()
 	{
-		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(FieldOfView), (ScreenWidth / ScreenHeight), NearPlane, FarPlane));
+		float aspectRatio = ScreenWidth / ScreenHeight;
+		DirectX::XMStoreFloat4x4(&ProjectionMatrix, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(FieldOfView), aspectRatio, NearPlane, FarPlane));
 
+		for (uint32_t i = 0; i < PartitionCount; ++i)
+		{
+			DirectX::XMStoreFloat4x4(&PartitionProjectionMatrix[i], DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(FieldOfView), aspectRatio, PartitionDepth[i], PartitionDepth[i + 1]));
+		}
 		//DirectX::XMStoreFloat4x4(&ViewProjectionMatrix, DirectX::XMLoadFloat4x4(&ViewMatrix) * DirectX::XMLoadFloat4x4(&ProjectionMatrix));
 	}
 
@@ -311,5 +318,20 @@ namespace Rendering
 	std::shared_ptr<Frustum>& Camera::GetFrustum()
 	{
 		return CameraFrustum;
+	}
+
+	const DirectX::XMFLOAT4X4 & Camera::GetPartitionProjectionMatrixByIndexAsFloat4x4(uint32_t index) const
+	{
+		return PartitionProjectionMatrix[index];
+	}
+
+	DirectX::XMMATRIX Camera::GetPartitionProjectionMatrixByIndex(uint32_t index) const
+	{
+		return DirectX::XMLoadFloat4x4(&PartitionProjectionMatrix[index]);
+	}
+
+	const uint32_t & Camera::GetPartitionCount()
+	{
+		return PartitionCount;
 	}
 }

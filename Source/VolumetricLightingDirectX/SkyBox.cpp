@@ -33,7 +33,7 @@ namespace Rendering
 
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
-		deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfSimpleVertexBuffer(), &stride, &offset);
 		deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
 		deviceContext->VSSetShader(SkyBoxVertexShader->GetVertexShader(), nullptr, 0);

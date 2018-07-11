@@ -21,7 +21,16 @@ namespace Rendering
 	{
 		ID3D11Device2* device = SceneManagerReference.GetRenderer()->GetDevice();
 
-		DefaultVertexShader = std::make_shared<Shader>(L"DefaultDeferredGeometryVertexShader.cso", Shader::ShaderType::VertexShader, device);
+		D3D11_INPUT_ELEMENT_DESC InputElementDescription[] =
+		{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXTURECOORDINATE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		};
+
+		DefaultVertexShader = std::make_shared<Shader>(L"DefaultDeferredGeometryVertexShader.cso", Shader::ShaderType::VertexShader, device, InputElementDescription, static_cast<uint32_t>(ARRAYSIZE(InputElementDescription)));
 		DefaultPixelShader = std::make_shared<Shader>(L"DefaultDeferredGeometryPixelShader.cso", Shader::ShaderType::PixelShader, device);
 
 		D3D11_SAMPLER_DESC samplerDescription;
@@ -36,7 +45,25 @@ namespace Rendering
 		//samplerDescription.MaxAnisotropy = 1;
 		//samplerDescription.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
-		device->CreateSamplerState(&samplerDescription, DefaultSamplerState.GetAddressOf());
+		device->CreateSamplerState(&samplerDescription, DefaultSamplerState.ReleaseAndGetAddressOf());
+
+		samplerDescription.Filter = D3D11_FILTER_MINIMUM_MIN_LINEAR_MAG_MIP_POINT;
+
+		device->CreateSamplerState(&samplerDescription, PointWrapSamplerState.ReleaseAndGetAddressOf());
+
+		samplerDescription.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDescription.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+		samplerDescription.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+
+		device->CreateSamplerState(&samplerDescription, PointClampSamplerState.ReleaseAndGetAddressOf());
+
+		samplerDescription.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+		samplerDescription.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+		samplerDescription.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+		samplerDescription.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+		samplerDescription.ComparisonFunc = D3D11_COMPARISON_LESS;
+
+		device->CreateSamplerState(&samplerDescription, ShadowMapSamplerState.ReleaseAndGetAddressOf());
 
 		D3D11_BUFFER_DESC constantBufferDescription;
 		ZeroMemory(&constantBufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -77,25 +104,28 @@ namespace Rendering
 
 		//Sponza Start
 
-		MainCamera->Move(DirectX::XMFLOAT3(30.0f, 100.0f, 0.0f));
+		MainCamera->Move(DirectX::XMFLOAT3(130.0f, 100.0f, 0.0f));
 		MainCamera->Rotate(MainCamera->GetUpVector(), 90.0f);
 
-		Lights->GetAmbientLight()->SetIntensity(0.2f);
-		Lights->GetDirectionalLight()->SetIntensity(2.0f);
+		Lights->GetAmbientLight()->SetIntensity(0.01f);
+		DirectX::XMFLOAT4 dLightColor = DirectX::XMFLOAT4(255.0f / 255.0f, 156.0f / 255.0f, 43.0f / 255.0f, 1.0f);
+		Lights->GetDirectionalLight()->SetColor(dLightColor);
+		Lights->GetDirectionalLight()->SetIntensity(32.0f);
 		Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 75.0f);
 		//Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, 180.0f);
 
-		Lights->CreatePointLight(DirectX::XMFLOAT3(0.0f, 30.0f, 50.0f), Utility::Red, 1.0f, 150.0f);
+		auto PLight = Lights->CreatePointLight(DirectX::XMFLOAT3(0.0f, 30.0f, 50.0f), Utility::Red, 3.0f, 250.0f);
+		PLight->SetIntensity(4.0f);
 
-		std::uniform_real_distribution<float> distribution(-250.0f, 250.0f);
+		/*std::uniform_real_distribution<float> distribution(-250.0f, 250.0f);
 		std::uniform_real_distribution<float> colordistribution(0, 1);
-		std::uniform_real_distribution<float> intensityDistribution(1.0f, 3.0f);
+		std::uniform_real_distribution<float> intensityDistribution(1.0f, 5.0f);
 		std::default_random_engine randomengine;
 
 		for (uint32_t i = 0; i < 40; ++i)
 		{
 			Lights->CreatePointLight(DirectX::XMFLOAT3((-750.0f + i*50.0f), distribution(randomengine), distribution(randomengine)), DirectX::XMFLOAT4(colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine)), intensityDistribution(randomengine), 300.0f);
-		}
+		}*/
 
 		Lights->GetDirectionalLight()->SetSourcePosition(DirectX::XMFLOAT3(0.0f, 500.0f, 0.0f));
 		Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));
@@ -214,14 +244,18 @@ namespace Rendering
 			
 			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() +10.0f);
 
-			//auto& dLight = Lights->GetDirectionalLight();
+			auto& dLight = Lights->GetDirectionalLight();
 			//auto& sourcePosition = dLight->GetSourcePosition();
 
 			//dLight->SetSourcePosition(DirectX::XMFLOAT3(sourcePosition.x , sourcePosition.y , sourcePosition.z + 10.0f));
 
-			dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).GetExposure() + 0.0001f);
+			//dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).GetExposure() + 0.0001f);
 
 			//Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 0.2f);
+
+			dLight->SetIntensity(dLight->GetIntensity() + 1.0f);
+
+			SSAOPostProcess->SetRadius(SSAOPostProcess->GetRadius() + 0.01f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseAttribute))
@@ -232,14 +266,18 @@ namespace Rendering
 
 			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() - 10.0f);
 
-			//auto& dLight = Lights->GetDirectionalLight();
+			auto& dLight = Lights->GetDirectionalLight();
 			//auto& sourcePosition = dLight->GetSourcePosition();
 
 			//dLight->SetSourcePosition(DirectX::XMFLOAT3(sourcePosition.x , sourcePosition.y , sourcePosition.z - 10.0f));
 
-			dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).GetExposure() - 0.0001f);
+			//dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).SetExposure(dynamic_cast<PostProcessGodRays&>(*PostProcessList[1]).GetExposure() - 0.0001f);
 
 			//Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, -0.2f);
+
+			dLight->SetIntensity(dLight->GetIntensity() - 1.0f);
+
+			SSAOPostProcess->SetRadius(SSAOPostProcess->GetRadius() - 0.01f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::RotateDirectionalLightRightIncrease))
@@ -279,14 +317,20 @@ namespace Rendering
 
 		if (inputMap.at(InputManager::InputActions::IncreaseExposure))
 		{
-			auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
-			hdr->SetExposure(hdr->GetExposure() + 0.1f);
+			//auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
+			//hdr->SetExposure(hdr->GetExposure() + 0.1f);
+
+			SSAOPostProcess->SetIntensity(SSAOPostProcess->GetIntensity() + 0.01f);
+
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseExposure))
 		{
-			auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
-			hdr->SetExposure(hdr->GetExposure() - 0.1f);
+			//auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
+			//hdr->SetExposure(hdr->GetExposure() - 0.1f);
+
+			SSAOPostProcess->SetIntensity(SSAOPostProcess->GetIntensity() - 0.01f);
+
 		}
 
 		MainCamera->SetPosition(currentPosition);
@@ -331,15 +375,18 @@ namespace Rendering
 
 		std::shared_ptr<HDRToneMapping> HDR = std::make_shared<HDRToneMapping>(device, ScreenQuad1);
 		HDR->ToggleGammaCorrection();
-		//HDR->ToggleHDR();
+		HDR->ToggleHDR();
 		PostProcessList.push_back(HDR);
 
-		std::shared_ptr<PostProcessGodRays> LightShafts = std::make_shared<PostProcessGodRays>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"PostProcessLightShaftsPixelShader.cso", Lights->GetDirectionalLight());
-		PostProcessList.push_back(LightShafts);
+		//std::shared_ptr<PostProcessGodRays> LightShafts = std::make_shared<PostProcessGodRays>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"PostProcessLightShaftsPixelShader.cso", Lights->GetDirectionalLight());
+		//PostProcessList.push_back(LightShafts);
+		//LightShafts->SetExposure(0.0f);
 
 		std::shared_ptr<FXAA> PostProcessFXAA = std::make_shared<FXAA>(device, ScreenQuad1);
 		PostProcessFXAA->SetScreenResolution(SceneManagerReference.GetRenderer()->GetScreenWidth(), SceneManagerReference.GetRenderer()->GetScreenHeight());;
 		PostProcessList.push_back(PostProcessFXAA);
+
+		SSAOPostProcess = std::make_shared<SSAO>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"SSAOPixelShader.cso");
 
 	}
 
@@ -360,8 +407,11 @@ namespace Rendering
 		deviceContext->IASetInputLayout(DefaultVertexShader->GetInputLayout());
 
 		deviceContext->VSSetConstantBuffers(0, 1, VSCBufferPerObject.GetAddressOf());
+		deviceContext->PSSetConstantBuffers(0, 1, VSCBufferPerObject.GetAddressOf());
 		
-		deviceContext->PSSetSamplers(0, 1, DefaultSamplerState.GetAddressOf());
+		static ID3D11SamplerState* samplerStates[4] = { DefaultSamplerState.Get(), ShadowMapSamplerState.Get(), PointClampSamplerState.Get(), PointWrapSamplerState.Get() };
+
+		deviceContext->PSSetSamplers(0, ARRAYSIZE(samplerStates), samplerStates);
 
 		DirectX::XMMATRIX viewProjectionMatrix = MainCamera->GetViewProjectionMatrix();
 
@@ -374,8 +424,10 @@ namespace Rendering
 			gameObject->Draw(direct3DRenderer, this , viewProjectionMatrix);
 		}
 
-		GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
-		Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);
+		//GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
+		//Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);
+
+		SSAOPostProcess->ApplyPostProcessing(this, direct3DRenderer);
 
 		direct3DRenderer->SetSceneBufferRenderTarget();
 		direct3DRenderer->DisableDepthWriting();
@@ -386,6 +438,7 @@ namespace Rendering
 		auto shaderResources = GBuffer1->GetAllShaderResourceViews();
 
 		shaderResources.push_back(Lights->GetDirectionalLightShadowMap()->GetShaderResourceView());
+		shaderResources.push_back(SSAOPostProcess->GetFinalSSAOTextureResource());
 		deviceContext->PSSetShaderResources(0, static_cast<uint32_t>(shaderResources.size()), shaderResources.data());
 
 		deviceContext->PSSetShader(Lights->GetDirectionalLightPixelShader()->GetPixelShader(), 0, 0);

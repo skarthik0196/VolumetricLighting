@@ -3,6 +3,7 @@
 #include <assimp\scene.h>
 #include "Model.h"
 #include "Material.h"
+#include "DirectXMesh.h"
 
 namespace Rendering
 {
@@ -43,18 +44,7 @@ namespace Rendering
 				//Normals.back().z = -Normals.back().z;
 			}
 		}
-
-		if (mesh.HasTangentsAndBitangents())
-		{
-			Tangents.reserve(mesh.mNumVertices);
-			BiNormals.reserve(mesh.mNumVertices);
-
-			for (uint32_t i = 0; i < mesh.mNumVertices; ++i)
-			{
-				Tangents.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mNormals[i])));
-				BiNormals.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mNormals[i])));
-			}
-		}
+	
 
 		uint32_t UVChannelCount = mesh.GetNumUVChannels();
 		for (uint32_t i = 0; i < UVChannelCount; ++i)
@@ -98,6 +88,25 @@ namespace Rendering
 					Indices.push_back(face->mIndices[j]);
 				}
 			}
+		}
+
+
+		if (mesh.HasTangentsAndBitangents())
+		{
+			Tangents.reserve(mesh.mNumVertices);
+			BiNormals.reserve(mesh.mNumVertices);
+
+			for (uint32_t i = 0; i < mesh.mNumVertices; ++i)
+			{
+				Tangents.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mTangents[i])));
+				//Tangents.back().z *= -1;
+				BiNormals.push_back(DirectX::XMFLOAT3(reinterpret_cast<float*>(&mesh.mBitangents[i])));
+			}
+		}
+		else
+		{
+			Tangents.resize(mesh.mNumVertices);
+			BiNormals.resize(mesh.mNumVertices);
 		}
 
 		CreateVertexBuffer(D3Ddevice);
@@ -183,28 +192,35 @@ namespace Rendering
 
 	void Mesh::CreateVertexBuffer(ID3D11Device2* device)
 	{
-		std::vector<Vertex> vertices;
+		std::vector<VertexNormalTangentBiNormal> vertices;
+		std::vector<Vertex> simpleVertices;
+
 		std::vector<DirectX::XMFLOAT3>& textureCoordinates = *(TextureCoordinates.at(0));
 
 		for (uint32_t i = 0; i < Vertices.size(); ++i)
 		{
 			DirectX::XMFLOAT4 position = DirectX::XMFLOAT4(Vertices[i].x, Vertices[i].y, Vertices[i].z, 1.0f);
 			DirectX::XMFLOAT2 uv = DirectX::XMFLOAT2(textureCoordinates[i].x, textureCoordinates[i].y);
-			vertices.emplace_back(position, uv, Normals[i]);
+			vertices.emplace_back(position, uv, Normals[i], Tangents[i], BiNormals[i]);
+			simpleVertices.emplace_back(position, uv, Normals[i]);
 		}
 
 		D3D11_BUFFER_DESC vertexBufferDescription;
 		ZeroMemory(&vertexBufferDescription, sizeof(vertexBufferDescription));
 
 		vertexBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vertexBufferDescription.ByteWidth = sizeof(Vertex) * static_cast<uint32_t>(vertices.size());
+		vertexBufferDescription.ByteWidth = sizeof(VertexNormalTangentBiNormal) * static_cast<uint32_t>(vertices.size());
 		vertexBufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
 
 		D3D11_SUBRESOURCE_DATA vertexSubresourceData = { 0 };
 		vertexSubresourceData.pSysMem = &vertices[0];
 
-		device->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, VertexBuffer.GetAddressOf());
+		device->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, VertexBuffer.ReleaseAndGetAddressOf());
 
+		vertexBufferDescription.ByteWidth = sizeof(Vertex) * static_cast<uint32_t>(vertices.size());
+		vertexSubresourceData.pSysMem = &simpleVertices[0];
+
+		device->CreateBuffer(&vertexBufferDescription, &vertexSubresourceData, SimpleVertexBuffer.ReleaseAndGetAddressOf());
 	}
 
 	ID3D11Buffer * Mesh::GetIndexBuffer()
@@ -222,6 +238,11 @@ namespace Rendering
 		return VertexBuffer.GetAddressOf();
 	}
 
+	ID3D11Buffer ** Mesh::GetAddressOfSimpleVertexBuffer()
+	{
+		return SimpleVertexBuffer.GetAddressOf();
+	}
+
 	ID3D11Buffer ** Mesh::GetAddressOfIndexBuffer()
 	{
 		return IndexBuffer.GetAddressOf();
@@ -233,6 +254,12 @@ namespace Rendering
 	}
 
 	Vertex::Vertex(const DirectX::XMFLOAT4& position, const DirectX::XMFLOAT2& textureCoordinates, const DirectX::XMFLOAT3& normals) :Position(position), TextureCoordinates(textureCoordinates), Normals(normals)
+	{
+
+	}
+
+	VertexNormalTangentBiNormal::VertexNormalTangentBiNormal(const DirectX::XMFLOAT4 & position, const DirectX::XMFLOAT2 & textureCoordinates, const DirectX::XMFLOAT3 & normal, const DirectX::XMFLOAT3 & tangent, const DirectX::XMFLOAT3 & biNormals)
+		: Position(position), TextureCoordinates(textureCoordinates), Normals(normal), Tangent(tangent), BiNormal(biNormals)
 	{
 
 	}

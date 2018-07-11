@@ -109,6 +109,10 @@
     <ClInclude Include="HDRToneMapping.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
+    <ClInclude Include="CascadedShadowMap.h" />
+    <ClInclude Include="SSAO.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -193,6 +197,10 @@
     <ClCompile Include="HDRToneMapping.cpp">
       <Filter>PostProcessing</Filter>
     </ClCompile>
+    <ClCompile Include="CascadedShadowMap.cpp" />
+    <ClCompile Include="SSAO.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -262,5 +270,18 @@
     <FxCompile Include="HDRPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="CascadedShadowMapPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="CascadedShadowMapVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SSAOPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SSAOBlurPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="HBAOPixelShader.hlsl" />
   </ItemGroup>
 </Project>

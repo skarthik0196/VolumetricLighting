@@ -52,11 +52,9 @@ namespace Rendering
 
 		Assimp::Importer importer;
 
-		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_FlipWindingOrder | aiProcess_ConvertToLeftHanded;
-		if (flipUVs)
-		{
-			flags |= aiProcess_FlipUVs;
-		}
+		uint32_t flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_CalcTangentSpace | aiProcess_ConvertToLeftHanded;
+
+		UNREFERENCED_PARAMETER(flipUVs);
 
 		const aiScene* scene = importer.ReadFile(fileName, flags);
 		if (scene == nullptr)

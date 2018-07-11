@@ -91,15 +91,15 @@ namespace Rendering
 	void LightManager::RenderPointLights(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer, const DirectX::XMMATRIX& viewProjectionMatrix)
 	{
 		static auto& pointLightVolume = PointLightVolume->GetMeshes()[0];
-		static auto pointLightVB = pointLightVolume->GetAddressOfVertexBuffer();
+		static auto pointLightVB = pointLightVolume->GetAddressOfSimpleVertexBuffer();
 		static auto pointLightIB = pointLightVolume->GetIndexBuffer();
 		static uint32_t indexCount = pointLightVolume->GetIndexCount();
 		static uint32_t stride = sizeof(Vertex);
 		static uint32_t offset = 0;
 
 		PLightPSData.CameraPosition = scene->GetCamera()->GetPositionAsFloat3();
-		PLightPSData.ScreenResolution.x = scene->GetCamera()->GetScreenWidth();
-		PLightPSData.ScreenResolution.y = scene->GetCamera()->GetScreenHeight();
+		PLightPSData.NoiseScale.x = scene->GetCamera()->GetScreenWidth();
+		PLightPSData.NoiseScale.y = scene->GetCamera()->GetScreenHeight();
 
 		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
@@ -163,7 +163,7 @@ namespace Rendering
 		DirectX::XMStoreFloat4x4(&LightSourceCBuffer.WorldMatrix, worldMatrix);
 		DirectX::XMStoreFloat4x4(&LightSourceCBuffer.WorldViewProjectionMatrix, WVP);
 
-		uint32_t stride = sizeof(Vertex);
+		uint32_t stride = sizeof(VertexNormalTangentBiNormal);
 		uint32_t offset = 0;
 
 		deviceContext->UpdateSubresource(scene->GetVSCBufferPerObject(), 0, nullptr, &LightSourceCBuffer, 0, 0);

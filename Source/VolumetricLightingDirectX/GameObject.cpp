@@ -118,7 +118,7 @@ namespace Rendering
 
 		deviceContext->UpdateSubresource(currentScene->GetVSCBufferPerObject(), 0, nullptr, &VSPerObjectData, 0, 0);
 
-		uint32_t stride = sizeof(Vertex);
+		uint32_t stride = sizeof(VertexNormalTangentBiNormal);
 		uint32_t offset = 0;
 
 		std::vector<std::shared_ptr<Mesh>> meshList = ObjectModel->GetMeshes();
@@ -134,15 +134,26 @@ namespace Rendering
 				if (mesh->GetMaterial() != nullptr)
 				{
 					auto textures = mesh->GetMaterial()->GetTextures();
-					if (textures[Texture::TextureType::Diffuse].size() > 0)
+
+					std::vector<ID3D11ShaderResourceView*> shaderResources
+					{ 
+						textures[Texture::TextureType::Diffuse][0]->GetShaderResourceView(),				//Albedo
+						textures[Texture::TextureType::HeightMap][0]->GetShaderResourceView(),				//Normal
+						textures[Texture::TextureType::Ambient][0]->GetShaderResourceView(),				//Metallic
+						textures[Texture::TextureType::SpecularPowerMap][0]->GetShaderResourceView()		//Roughness
+					};
+
+					deviceContext->PSSetShaderResources(0, static_cast<uint32_t>(shaderResources.size()), shaderResources.data());
+
+					/*if (textures[Texture::TextureType::Diffuse].size() > 0)
 					{
 						deviceContext->PSSetShaderResources(0, 1, textures[Texture::TextureType::Diffuse][0]->GetAddressOfShaderResourceView());
-					}
-					if (textures[Texture::TextureType::NormalMap].size() > 0)
+					}*/
+					/*if (textures[Texture::TextureType::HeightMap].size() == 0 || textures[Texture::TextureType::Ambient].size() == 0 || textures[Texture::TextureType::SpecularPowerMap].size() == 0)
 					{
 						int a;
 						a = 10;
-					}
+					}*/
 				}
 				deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 			}

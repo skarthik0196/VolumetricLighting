@@ -31,7 +31,8 @@ namespace Rendering
 		const DirectX::XMFLOAT3& GetSourceScale() const;
 
 		const DirectX::XMFLOAT4X4& GetWorldMatrix() const;
-
+		
+		bool HasBeenUpdated() const;
 		DirectX::XMMATRIX GetViewProjectionMatrix();
 
 	private:

@@ -107,3 +107,12 @@ std::wstring StringToWideString(const std::string& str)
 	MultiByteToWideChar(CP_UTF8, 0, &str[0], static_cast<uint32_t>(str.size()), &wstr[0], sizeRequired);
 	return wstr;
 }
+
+
+/*
+PBR Encoding reference
+Diffuse - Allbedo
+Ambient - Metallic
+
+
+*/

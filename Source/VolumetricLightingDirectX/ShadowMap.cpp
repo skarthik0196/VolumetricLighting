@@ -15,49 +15,52 @@ namespace Rendering
 
 	void ShadowMap::RenderShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer, Scene * currentScene)
 	{
-		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
-
-		direct3DRenderer->EnableDepthTesting();
-		deviceContext->RSSetViewports(1, &ShadowMapViewPort);
-
-		deviceContext->ClearDepthStencilView(ShadowMapDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-		deviceContext->RSSetState(ShadowMapRasterizerState.Get());
-		deviceContext->VSSetShader(ShadowMapVertexShader->GetVertexShader(), 0, 0);
-		deviceContext->PSSetShader(NULL, 0, 0);
-
-		ID3D11ShaderResourceView* nullPSResouce[] = { nullptr,nullptr,nullptr, nullptr };
-		deviceContext->PSSetShaderResources(0, 4, nullPSResouce);
-		ID3D11RenderTargetView* nullRT = { 0 };
-
-		deviceContext->OMSetRenderTargets(1, &nullRT, ShadowMapDepthStencilView.Get());
-		deviceContext->IASetInputLayout(ShadowMapVertexShader->GetInputLayout());
-
-		deviceContext->VSSetConstantBuffers(0, 1, VSCBuffer.GetAddressOf());
-
-		auto viewProjection = ShadowMapLight->GetViewProjectionMatrix();
-		auto& gameObjectList = currentScene->GetGameObjectList();
-
-		uint32_t stride = sizeof(Vertex);
-		uint32_t offset = 0;
-
-		for (auto& gameObject : gameObjectList)
+		if (ShadowMapLight->HasBeenUpdated())
 		{
-			auto& meshList = gameObject->GetObjectModel()->GetMeshes();
-			auto worldMatrix = gameObject->GetWorldMatrix();
-			auto wvp = DirectX::XMMatrixMultiply(worldMatrix, viewProjection);
+			ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
 
-			DirectX::XMStoreFloat4x4(&VSData.LightWorldViewProjectionMatrix, DirectX::XMMatrixTranspose(wvp));
-			deviceContext->UpdateSubresource(VSCBuffer.Get(), 0, nullptr, &VSData, 0, 0);
-			
-			for (auto& mesh : meshList)
+			direct3DRenderer->EnableDepthTesting();
+			deviceContext->RSSetViewports(1, &ShadowMapViewPort);
+
+			deviceContext->ClearDepthStencilView(ShadowMapDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+			deviceContext->RSSetState(ShadowMapRasterizerState.Get());
+			deviceContext->VSSetShader(ShadowMapVertexShader->GetVertexShader(), 0, 0);
+			deviceContext->PSSetShader(NULL, 0, 0);
+
+			ID3D11ShaderResourceView* nullPSResouce[] = { nullptr,nullptr,nullptr, nullptr };
+			deviceContext->PSSetShaderResources(0, 4, nullPSResouce);
+			ID3D11RenderTargetView* nullRT = { 0 };
+
+			deviceContext->OMSetRenderTargets(1, &nullRT, ShadowMapDepthStencilView.Get());
+			deviceContext->IASetInputLayout(ShadowMapVertexShader->GetInputLayout());
+
+			deviceContext->VSSetConstantBuffers(0, 1, VSCBuffer.GetAddressOf());
+
+			auto viewProjection = ShadowMapLight->GetViewProjectionMatrix();
+			auto& gameObjectList = currentScene->GetGameObjectList();
+
+			uint32_t stride = sizeof(Vertex);
+			uint32_t offset = 0;
+
+			for (auto& gameObject : gameObjectList)
 			{
-				deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
-				deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-				deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
-			}
-		}
+				auto& meshList = gameObject->GetObjectModel()->GetMeshes();
+				auto worldMatrix = gameObject->GetWorldMatrix();
+				auto wvp = DirectX::XMMatrixMultiply(worldMatrix, viewProjection);
 
-		direct3DRenderer->SetRasterizerState(Direct3D::RasterizerState::BackFaceCulling);
+				DirectX::XMStoreFloat4x4(&VSData.LightWorldViewProjectionMatrix, DirectX::XMMatrixTranspose(wvp));
+				deviceContext->UpdateSubresource(VSCBuffer.Get(), 0, nullptr, &VSData, 0, 0);
+
+				for (auto& mesh : meshList)
+				{
+					deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfSimpleVertexBuffer(), &stride, &offset);
+					deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+					deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+				}
+			}
+
+			direct3DRenderer->SetRasterizerState(Direct3D::RasterizerState::BackFaceCulling);
+		}
 	}
 
 	ID3D11ShaderResourceView* ShadowMap::GetShaderResourceView()
@@ -72,8 +75,8 @@ namespace Rendering
 		D3D11_TEXTURE2D_DESC depthTextureDescription{ 0 };
 
 		depthTextureDescription.Format = DXGI_FORMAT_R24G8_TYPELESS;
-		depthTextureDescription.Width = 2048;// static_cast<uint32_t>(direct3DRenderer->GetScreenWidth());
-		depthTextureDescription.Height = 2048;// static_cast<uint32_t>(direct3DRenderer->GetScreenHeight());
+		depthTextureDescription.Width = ShadowMapResolution;// static_cast<uint32_t>(direct3DRenderer->GetScreenWidth());
+		depthTextureDescription.Height = ShadowMapResolution;// static_cast<uint32_t>(direct3DRenderer->GetScreenHeight());
 		depthTextureDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		depthTextureDescription.MipLevels = 1;
 		depthTextureDescription.ArraySize = 1;
@@ -119,8 +122,8 @@ namespace Rendering
 
 		device->CreateRasterizerState(&rasterizerDescription, ShadowMapRasterizerState.ReleaseAndGetAddressOf());
 
-		ShadowMapViewPort.Height = 2048;
-		ShadowMapViewPort.Width = 2048;
+		ShadowMapViewPort.Height = ShadowMapResolution;
+		ShadowMapViewPort.Width = ShadowMapResolution;
 		ShadowMapViewPort.MaxDepth = 1.0f;
 		ShadowMapViewPort.MinDepth = 0.0f;
 		ShadowMapViewPort.TopLeftX = 0;

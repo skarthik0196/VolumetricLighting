@@ -19,6 +19,17 @@ namespace Rendering
 		Vertex(const DirectX::XMFLOAT4& position, const DirectX::XMFLOAT2& textureCoordinates, const DirectX::XMFLOAT3& normals);
 	};
 
+	struct VertexNormalTangentBiNormal
+	{
+		DirectX::XMFLOAT4 Position;
+		DirectX::XMFLOAT2 TextureCoordinates;
+		DirectX::XMFLOAT3 Normals;
+		DirectX::XMFLOAT3 Tangent;
+		DirectX::XMFLOAT3 BiNormal;
+
+		VertexNormalTangentBiNormal(const DirectX::XMFLOAT4& position, const DirectX::XMFLOAT2& textureCoordinates, const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& tangent, const DirectX::XMFLOAT3& biNormals);
+	};
+
 	class Mesh
 	{
 	public:
@@ -53,6 +64,7 @@ namespace Rendering
 		ID3D11Buffer* GetVertexBuffer();
 
 		ID3D11Buffer** GetAddressOfVertexBuffer();
+		ID3D11Buffer** GetAddressOfSimpleVertexBuffer();
 		ID3D11Buffer** GetAddressOfIndexBuffer();
 
 		std::shared_ptr<Material> GetMaterial() const;
@@ -62,6 +74,7 @@ namespace Rendering
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> IndexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> SimpleVertexBuffer;
 
 		Model& ReferenceToModel;
 

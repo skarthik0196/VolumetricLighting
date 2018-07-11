@@ -8,6 +8,7 @@
 #include "ScreenQuad.h"
 #include "PostProcessing.h"
 #include "SkyBox.h"
+#include "SSAO.h"
 
 namespace Rendering
 {
@@ -51,6 +52,8 @@ namespace Rendering
 		SceneManager& SceneManagerReference;
 		std::vector<std::shared_ptr<GameObject>> GameObjectList;
 		std::vector <std::shared_ptr<PostProcessing>> PostProcessList;
+
+		std::shared_ptr<SSAO> SSAOPostProcess;
 		
 		std::shared_ptr<Camera> MainCamera;
 		std::shared_ptr<LightManager> Lights;
@@ -67,6 +70,9 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11Buffer> PSCBufferPerFrame;
 
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> DefaultSamplerState;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> ShadowMapSamplerState;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> PointClampSamplerState;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> PointWrapSamplerState;
 	};
 }
 

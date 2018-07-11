@@ -18,7 +18,7 @@ namespace Rendering
 		};
 
 		ShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer, std::shared_ptr<DirectionalLight>& light);
-		~ShadowMap() = default;
+		virtual ~ShadowMap() = default;
 		
 		void RenderShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer, Scene* currentScene);
 		
@@ -45,6 +45,8 @@ namespace Rendering
 		std::shared_ptr<Shader> ShadowMapPixelShader;
 
 		std::shared_ptr<DirectionalLight>& ShadowMapLight;
+
+		static const uint32_t ShadowMapResolution = 4096;
 	};
 }
 

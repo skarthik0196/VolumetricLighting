@@ -37,7 +37,7 @@ namespace Rendering
 			DirectX::XMFLOAT4 PointLightPosition;
 			DirectX::XMFLOAT3 CameraPosition;
 			float Radius;
-			DirectX::XMFLOAT2 ScreenResolution;
+			DirectX::XMFLOAT2 NoiseScale;
 			float Padding1;
 			float Padding2;
 		};

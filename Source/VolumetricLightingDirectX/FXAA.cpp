@@ -47,8 +47,8 @@ namespace Rendering
 
 	void FXAA::SetScreenResolution(float screenWidth, float screenHeight)
 	{
-		PSData.ScreenResolution.x = screenWidth;
-		PSData.ScreenResolution.y = screenHeight;
+		PSData.NoiseScale.x = screenWidth;
+		PSData.NoiseScale.y = screenHeight;
 		NeedsBufferUpdate = true;
 	}
 

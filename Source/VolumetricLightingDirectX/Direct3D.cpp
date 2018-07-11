@@ -33,8 +33,8 @@ namespace Rendering
 		depthStencilBufferDescription.Height = static_cast<uint32_t>(ScreenHeight);
 		depthStencilBufferDescription.MipLevels = MipLevels;
 		depthStencilBufferDescription.ArraySize = 1;
-		depthStencilBufferDescription.Format = DXGI_FORMAT_D32_FLOAT;
-		depthStencilBufferDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthStencilBufferDescription.Format = DXGI_FORMAT_R32_TYPELESS;
+		depthStencilBufferDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		depthStencilBufferDescription.Usage = D3D11_USAGE_DEFAULT;
 		depthStencilBufferDescription.SampleDesc.Count = GetMultiSamplingCount();
 		depthStencilBufferDescription.SampleDesc.Quality = GetMultiSamplingQualityLevels() - 1;
@@ -48,6 +48,16 @@ namespace Rendering
 		depthStencilViewDescription.Texture2D.MipSlice = 0;
 
 		result = Device->CreateTexture2D(&depthStencilBufferDescription, nullptr, DepthBuffer.GetAddressOf());
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC depthResourceDescription;
+		ZeroMemory(&depthResourceDescription, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+
+		depthResourceDescription.Format = DXGI_FORMAT_R32_FLOAT;
+		depthResourceDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		depthResourceDescription.Texture2D.MipLevels = depthStencilBufferDescription.MipLevels;
+		depthResourceDescription.Texture2D.MostDetailedMip = 0;
+
+		result = Device->CreateShaderResourceView(DepthBuffer.Get(), &depthResourceDescription, DepthResource.ReleaseAndGetAddressOf());
 
 		D3D11_DEPTH_STENCIL_DESC depthStencilDescription;
 
@@ -317,5 +327,15 @@ namespace Rendering
 	ID3D11ShaderResourceView ** Direct3D::GetAddressOfToneMappedTextureResouceView()
 	{
 		return ToneMappedResource.GetAddressOf();
+	}
+
+	ID3D11ShaderResourceView ** Direct3D::GetAddressOfSceneDepthBufferResource()
+	{
+		return DepthResource.GetAddressOf();
+	}
+
+	ID3D11ShaderResourceView * Direct3D::GetSceneDepthBufferResource()
+	{
+		return DepthResource.Get();
 	}
 }

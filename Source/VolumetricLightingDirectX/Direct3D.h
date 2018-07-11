@@ -54,6 +54,9 @@ namespace Rendering
 		ID3D11ShaderResourceView* GetToneMappedTextureResouceView();
 		ID3D11ShaderResourceView** GetAddressOfToneMappedTextureResouceView();
 
+		ID3D11ShaderResourceView** GetAddressOfSceneDepthBufferResource();
+		ID3D11ShaderResourceView* GetSceneDepthBufferResource();
+
 	private:
 		void CreateViewPort();
 		void CreateBlendStates();
@@ -71,6 +74,7 @@ namespace Rendering
 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> SceneResource;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ToneMappedResource;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DepthResource;
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DepthEnabledState;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DepthWritingDisabledState;

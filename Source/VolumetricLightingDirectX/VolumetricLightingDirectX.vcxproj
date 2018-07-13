@@ -212,6 +212,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PostProcessGodRays.h" />
     <ClInclude Include="PostProcessing.h" />
+    <ClInclude Include="Query.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Scene.h" />
@@ -254,6 +255,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PostProcessGodRays.cpp" />
     <ClCompile Include="PostProcessing.cpp" />
+    <ClCompile Include="Query.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="ScreenQuad.cpp" />
@@ -273,6 +275,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <Image Include="VolumetricLightingDirectX.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CourierNew.spritefont" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

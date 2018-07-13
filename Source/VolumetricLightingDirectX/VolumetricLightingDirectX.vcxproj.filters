@@ -113,6 +113,7 @@
     <ClInclude Include="SSAO.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
+    <ClInclude Include="Query.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="SSAO.cpp">
       <Filter>PostProcessing</Filter>
     </ClCompile>
+    <ClCompile Include="Query.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -217,6 +219,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="CourierNew.spritefont">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DefaultVertexShader.hlsl">

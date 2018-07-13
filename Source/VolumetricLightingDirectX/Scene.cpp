@@ -398,12 +398,13 @@ namespace Rendering
 
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::ShadowMap);
 		Lights->RenderDirectionalLightShadowMap(this, direct3DRenderer);
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::ShadowMap);
 
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::GeometryPass);
 		direct3DRenderer->SetViewPort();
-
 		deviceContext->VSSetShader(DefaultVertexShader->GetVertexShader(), 0, 0);
-
 		deviceContext->IASetInputLayout(DefaultVertexShader->GetInputLayout());
 
 		deviceContext->VSSetConstantBuffers(0, 1, VSCBufferPerObject.GetAddressOf());
@@ -423,18 +424,22 @@ namespace Rendering
 		{
 			gameObject->Draw(direct3DRenderer, this , viewProjectionMatrix);
 		}
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::GeometryPass);
 
 		//GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
 		//Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);
 
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::SSAO);
 		SSAOPostProcess->ApplyPostProcessing(this, direct3DRenderer);
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::SSAO);
 
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::LightingPass);
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::DirectionalLighting);
 		direct3DRenderer->SetSceneBufferRenderTarget();
 		direct3DRenderer->DisableDepthWriting();
 		direct3DRenderer->BeginAdditiveBlending();
 
 		ScreenQuad1->BindScreenQuadVertexShader(deviceContext);
-		//GBuffer1->BindGBufferData(deviceContext);
 		auto shaderResources = GBuffer1->GetAllShaderResourceViews();
 
 		shaderResources.push_back(Lights->GetDirectionalLightShadowMap()->GetShaderResourceView());
@@ -444,11 +449,15 @@ namespace Rendering
 		deviceContext->PSSetShader(Lights->GetDirectionalLightPixelShader()->GetPixelShader(), 0, 0);
 		Lights->BindDLightCBuffer(this, direct3DRenderer);
 		ScreenQuad1->DrawScreenQuad(deviceContext);
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::DirectionalLighting);
 
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::PointLighting);
 		GBuffer1->BindGBufferData(deviceContext);
 		direct3DRenderer->EnableAdditiveBlending();
 
 		Lights->RenderPointLights(this, direct3DRenderer, viewProjectionMatrix);
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::PointLighting);
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::LightingPass);
 
 		direct3DRenderer->DisableBlending();
 		GBuffer1->UnBindBufferData(deviceContext);
@@ -456,12 +465,16 @@ namespace Rendering
 		SceneSkyBox->Draw(direct3DRenderer, this, viewProjectionMatrix);
 		direct3DRenderer->DisableDepthTesting();
 
+		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::PostProcessing);
 		for (auto& postProcess : PostProcessList)
 		{
 			postProcess->ApplyPostProcessing(this, direct3DRenderer);
 		}
+		SceneManagerReference.EndQuery(SceneManager::QueryTypes::PostProcessing);
 
 		direct3DRenderer->EnableDepthTesting();
+
+		SceneManagerReference.RenderQueryData();
 	}
 
 	void Scene::AddGameObject(std::shared_ptr<GameObject> gameObject)

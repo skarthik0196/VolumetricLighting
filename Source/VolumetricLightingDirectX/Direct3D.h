@@ -1,6 +1,7 @@
 #pragma once
 #include "Direct3DCore.h"
 #include "Utility.h"
+#include "Query.h"
 
 namespace Rendering
 {
@@ -44,6 +45,8 @@ namespace Rendering
 		void SetViewPort();
 
 		bool GetVSyncStatus();
+
+		void BeginFrameQuery();
 
 		void SetRasterizerState(RasterizerState cullMode);
 
@@ -93,6 +96,7 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> DisableCulling;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> WireFrameMode;
 
-		
+		std::shared_ptr<Query> FrameQuery;
+		float FrameTime;
 	};
 }

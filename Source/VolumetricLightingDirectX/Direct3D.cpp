@@ -136,6 +136,9 @@ namespace Rendering
 		EnableDepthTesting();
 		SetFrameBufferRenderTarget();
 		CreateViewPort();
+
+		Query::InitializeDisjointQuery(Device.Get());
+		FrameQuery = std::make_shared<Query>(Device.Get());
 	}
 
 	void Direct3D::CreateViewPort()
@@ -210,6 +213,12 @@ namespace Rendering
 	void Direct3D::RenderToScreen()
 	{
 		SwapChain->Present(static_cast<uint32_t>(VSync), 0);
+		FrameQuery->EndQuery(DeviceContext.Get());
+		Query::EndDisjointQuery(DeviceContext.Get());
+		Query::SwapQueryBuffers();
+		Query::GetDisjointTimeStamp(DeviceContext.Get());
+		FrameTime = FrameQuery->GetQueryTime(DeviceContext.Get());
+		DeviceContext->ClearState();
 	}
 
 	void Direct3D::SetVSync(bool vsyncStatus)
@@ -240,6 +249,12 @@ namespace Rendering
 	bool Direct3D::GetVSyncStatus()
 	{
 		return VSync;
+	}
+
+	void Direct3D::BeginFrameQuery()
+	{
+		Query::BeginDisjointQuery(DeviceContext.Get());
+		FrameQuery->BeginQuery(DeviceContext.Get());
 	}
 
 	void Direct3D::SetRasterizerState(RasterizerState cullMode)

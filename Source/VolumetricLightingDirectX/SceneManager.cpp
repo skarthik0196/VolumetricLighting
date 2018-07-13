@@ -8,19 +8,25 @@
 
 namespace Rendering
 {
-	SceneManager::SceneManager(const std::string& filePath, float screenWidth, float screenHeight) : Direct3DRenderer(std::make_shared<Direct3D>(screenWidth, screenHeight)), Input(std::make_shared<InputManager>(Direct3DRenderer->GetWindowHandle()))
+	SceneManager::SceneManager(const std::string& filePath, float screenWidth, float screenHeight) : Direct3DRenderer(std::make_shared<Direct3D>(screenWidth, screenHeight)), Input(std::make_shared<InputManager>(Direct3DRenderer->GetWindowHandle())), Font(std::make_shared<DirectX::SpriteFont>(Direct3DRenderer->GetDevice(), L"Content\\Fonts\\CourierNew.spritefont"))
+																									,SpriteBatcher(std::make_shared<DirectX::SpriteBatch>(Direct3DRenderer->GetDeviceContext()))
 	{
 		LoadScene(filePath);
+		InitializeQueries();
 	}
 
-	SceneManager::SceneManager(std::shared_ptr<Direct3D> direct3DRenderer) : Direct3DRenderer(direct3DRenderer), Input(std::make_shared<InputManager>(Direct3DRenderer->GetWindowHandle()))
+	SceneManager::SceneManager(std::shared_ptr<Direct3D>& direct3DRenderer) : Direct3DRenderer(direct3DRenderer), Input(std::make_shared<InputManager>(Direct3DRenderer->GetWindowHandle())), Font(std::make_shared<DirectX::SpriteFont>(direct3DRenderer->GetDevice(), L"Content\\Fonts\\CourierNew.spritefont"))
+																			, SpriteBatcher(std::make_shared<DirectX::SpriteBatch>(Direct3DRenderer->GetDeviceContext()))
 	{
 		CreateScene();
+		InitializeQueries();
 	}
 
-	SceneManager::SceneManager(std::shared_ptr<Direct3D> direct3DRenderer, const std::string & filePath) : Direct3DRenderer(direct3DRenderer), Input(std::make_shared<InputManager>(Direct3DRenderer->GetWindowHandle()))
+	SceneManager::SceneManager(std::shared_ptr<Direct3D>& direct3DRenderer, const std::string & filePath) : Direct3DRenderer(direct3DRenderer), Input(std::make_shared<InputManager>(Direct3DRenderer->GetWindowHandle())), Font(std::make_shared<DirectX::SpriteFont>(direct3DRenderer->GetDevice(), L"Content\\Fonts\\CourierNew.spritefont"))
+																											, SpriteBatcher(std::make_shared<DirectX::SpriteBatch>(Direct3DRenderer->GetDeviceContext()))
 	{
 		LoadScene(filePath);
+		InitializeQueries();
 	}
 
 	void SceneManager::AddScene(std::shared_ptr<Scene> newScene)
@@ -130,12 +136,90 @@ namespace Rendering
 
 	void SceneManager::DrawCurrentScene()
 	{
+		CollectQueryStats();
+		Direct3DRenderer->BeginFrameQuery();
 		Direct3DRenderer->ClearRenderTarget();
 		Direct3DRenderer->ClearDepthStencilView();
 		
 		SceneList[CurrentSceneIndex]->DrawScene(Direct3DRenderer);
 
+		RenderQueryData();
+
 		Direct3DRenderer->RenderToScreen();
+	}
+
+	void SceneManager::BeginQuery(QueryTypes queryType)
+	{
+		if (queryType != QueryTypes::End)
+		{
+			QueryList[static_cast<uint32_t>(queryType)]->BeginQuery(Direct3DRenderer->GetDeviceContext());
+		}
+	}
+
+	void SceneManager::EndQuery(QueryTypes queryType)
+	{
+		if (queryType != QueryTypes::End)
+		{
+			QueryList[static_cast<uint32_t>(queryType)]->EndQuery(Direct3DRenderer->GetDeviceContext());
+		}
+	}
+
+
+	void SceneManager::InitializeQueries()
+	{
+		ID3D11Device2* device = Direct3DRenderer->GetDevice();
+
+		for (QueryTypes i = QueryTypes::ShadowMap; i < QueryTypes::End; i = static_cast<QueryTypes>(static_cast<uint32_t>(i) + 1))
+		{
+			QueryList.push_back(std::make_shared<Query>(device));
+		}
+	}
+
+	void SceneManager::CollectQueryStats()
+	{
+		for (QueryTypes i = QueryTypes::ShadowMap; i < QueryTypes::End; i = static_cast<QueryTypes>(static_cast<uint32_t>(i) + 1))
+		{
+			float time;
+			time = QueryList[static_cast<uint32_t>(i)]->GetQueryTime(Direct3DRenderer->GetDeviceContext());
+			//time = static_cast<float>(static_cast<int32_t>((time * 100 + 0.5f)));
+			//time = (float)time / 100;
+			Times[static_cast<uint32_t>(i)] = time;
+		}
+	}
+
+	void SceneManager::RenderQueryData()
+	{
+		using namespace DirectX;
+		static DirectX::XMFLOAT2 position = DirectX::XMFLOAT2(50.0f, 50.0f);
+		static DirectX::XMFLOAT4 scale = DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
+
+		std::wstring queryDataString;
+		queryDataString = L"Geomentry Pass : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::GeometryPass)]);
+		queryDataString += L"\nShadowMap Pass : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::ShadowMap)]);
+		queryDataString += L"\nSSAO Pass : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::SSAO)]);
+		queryDataString += L"\nLighting Pass : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::LightingPass)]);
+		queryDataString += L"\nDirectional Lighting Pass : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::DirectionalLighting)]);
+		queryDataString += L"\nPoint Lighting Pass : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::PointLighting)]);
+		queryDataString += L"\nPostProcessing : " + std::to_wstring(Times[static_cast<uint32_t>(QueryTypes::PostProcessing)]);;
+		
+
+
+		//for (QueryTypes i = QueryTypes::ShadowMap; i < QueryTypes::End; i = static_cast<QueryTypes>(static_cast<uint32_t>(i) + 1))
+		//{
+		//	queryDataString += std::to_wstring(Times[static_cast<uint32_t>(i)]);
+		//}
+
+		//ID3D11RasterizerState *rasterizerState;
+		//Direct3DRenderer->GetDeviceContext()->RSGetState(&rasterizerState);
+
+		SpriteBatcher->Begin();
+		auto origin = Font->MeasureString(queryDataString.c_str()) / 2.0f;
+
+		Font->DrawString(SpriteBatcher.get(), queryDataString.c_str(), DirectX::XMLoadFloat2(&position), DirectX::XMLoadFloat4(&Utility::White), 0.0f, DirectX::XMVectorZero(), DirectX::XMLoadFloat4(&scale));
+
+		SpriteBatcher->End();
+		
+		//Direct3DRenderer->GetDeviceContext()->RSSetState(rasterizerState);
 	}
 
 	std::shared_ptr<Direct3D>& SceneManager::GetRenderer()

@@ -216,7 +216,7 @@ float4 main( VS_INPUT Input ) : SV_TARGET
 	float3 Diffuse = lerp(0.0f, L0, ShadowFactor);
 
 	float AOFactor = SSAOTexture.Sample(Sampler, Input.TextureCoordinate).r;
-	float3 Ambient = Albedo.rgb * AmbientColor * AOFactor;
+	float3 Ambient = Albedo.rgb * AmbientColor.rgb * AOFactor;
 	
 	OutputColor.rgb = Diffuse + Ambient;
 

@@ -114,6 +114,9 @@
       <Filter>PostProcessing</Filter>
     </ClInclude>
     <ClInclude Include="Query.h" />
+    <ClInclude Include="VolumetricLight.h">
+      <Filter>PostProcessing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -203,6 +206,9 @@
       <Filter>PostProcessing</Filter>
     </ClCompile>
     <ClCompile Include="Query.cpp" />
+    <ClCompile Include="VolumetricLight.cpp">
+      <Filter>PostProcessing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -288,5 +294,10 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="HBAOPixelShader.hlsl" />
+    <FxCompile Include="VolumetricLightPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="BlurXPixelShader.hlsl" />
+    <FxCompile Include="BlurYPixelShader.hlsl" />
   </ItemGroup>
 </Project>

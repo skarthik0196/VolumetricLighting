@@ -7,6 +7,7 @@
 #include "FXAA.h"
 #include "PostProcessGodRays.h"
 #include "HDRToneMapping.h"
+#include "VolumetricLight.h"
 
 namespace Rendering
 {
@@ -73,8 +74,6 @@ namespace Rendering
 
 		device->CreateBuffer(&constantBufferDescription, nullptr, VSCBufferPerObject.GetAddressOf());
 
-		AddPostProcessingEffects(device);
-
 		// Bistro Start
 
 		/*MainCamera->Rotate(MainCamera->GetRightVectorN(), -90.0f);
@@ -107,7 +106,7 @@ namespace Rendering
 		MainCamera->Move(DirectX::XMFLOAT3(130.0f, 100.0f, 0.0f));
 		MainCamera->Rotate(MainCamera->GetUpVector(), 90.0f);
 
-		Lights->GetAmbientLight()->SetIntensity(0.01f);
+		Lights->GetAmbientLight()->SetIntensity(0.05f);
 		DirectX::XMFLOAT4 dLightColor = DirectX::XMFLOAT4(255.0f / 255.0f, 156.0f / 255.0f, 43.0f / 255.0f, 1.0f);
 		Lights->GetDirectionalLight()->SetColor(dLightColor);
 		Lights->GetDirectionalLight()->SetIntensity(32.0f);
@@ -134,6 +133,8 @@ namespace Rendering
 
 		Lights->UpdateDirectionalCBufferData();
 		Lights->CreateDirectionalLightShadowMap(SceneManagerReference.GetRenderer());
+
+		AddPostProcessingEffects(device);
 	}
 
 	std::shared_ptr<Shader>& Scene::GetDefaultVertexShader()
@@ -320,8 +321,8 @@ namespace Rendering
 			//auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
 			//hdr->SetExposure(hdr->GetExposure() + 0.1f);
 
-			SSAOPostProcess->SetIntensity(SSAOPostProcess->GetIntensity() + 0.01f);
-
+			//SSAOPostProcess->SetIntensity(SSAOPostProcess->GetIntensity() + 0.01f);
+			dynamic_cast<VolumetricLight&>(*PostProcessList[1]).SetScatteringAmount(dynamic_cast<VolumetricLight&>(*PostProcessList[1]).GetScatteringAmount() + 0.1f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseExposure))
@@ -329,8 +330,8 @@ namespace Rendering
 			//auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
 			//hdr->SetExposure(hdr->GetExposure() - 0.1f);
 
-			SSAOPostProcess->SetIntensity(SSAOPostProcess->GetIntensity() - 0.01f);
-
+			//SSAOPostProcess->SetIntensity(SSAOPostProcess->GetIntensity() - 0.01f);
+			dynamic_cast<VolumetricLight&>(*PostProcessList[1]).SetScatteringAmount(dynamic_cast<VolumetricLight&>(*PostProcessList[1]).GetScatteringAmount() - 0.1f);
 		}
 
 		MainCamera->SetPosition(currentPosition);
@@ -382,6 +383,10 @@ namespace Rendering
 		//PostProcessList.push_back(LightShafts);
 		//LightShafts->SetExposure(0.0f);
 
+		std::shared_ptr<VolumetricLight> VLight = std::make_shared<VolumetricLight>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"VolumetricLightPixelShader.cso");
+		VLight->SetShadowMap(Lights->GetDirectionalLightShadowMap());
+		PostProcessList.push_back(VLight);
+
 		std::shared_ptr<FXAA> PostProcessFXAA = std::make_shared<FXAA>(device, ScreenQuad1);
 		PostProcessFXAA->SetScreenResolution(SceneManagerReference.GetRenderer()->GetScreenWidth(), SceneManagerReference.GetRenderer()->GetScreenHeight());;
 		PostProcessList.push_back(PostProcessFXAA);
@@ -426,8 +431,8 @@ namespace Rendering
 		}
 		SceneManagerReference.EndQuery(SceneManager::QueryTypes::GeometryPass);
 
-		//GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
-		//Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);
+		/*GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
+		Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);*/
 
 		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::SSAO);
 		SSAOPostProcess->ApplyPostProcessing(this, direct3DRenderer);

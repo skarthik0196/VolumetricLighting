@@ -25,9 +25,9 @@ float4 main(VS_OUTPUT Input) : SV_TARGET
 
 	float3 GammaCorrectedColor;
 	float InverseGamma = 1.0 / GammaCorrection;
-	GammaCorrectedColor.x = pow(toneMappedColor.x, InverseGamma);
-	GammaCorrectedColor.y = pow(toneMappedColor.y, InverseGamma);
-	GammaCorrectedColor.z = pow(toneMappedColor.z, InverseGamma);
+	GammaCorrectedColor.x = pow(abs(toneMappedColor.x), InverseGamma);
+	GammaCorrectedColor.y = pow(abs(toneMappedColor.y), InverseGamma);
+	GammaCorrectedColor.z = pow(abs(toneMappedColor.z), InverseGamma);
 
 	float3 OutputColor = lerp(toneMappedColor, GammaCorrectedColor, ApplyGammaCorrection);
 

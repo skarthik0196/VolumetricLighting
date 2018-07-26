@@ -21,8 +21,10 @@ namespace Rendering
 		virtual ~ShadowMap() = default;
 		
 		void RenderShadowMap(std::shared_ptr<Direct3D>& direct3DRenderer, Scene* currentScene);
-		
+		std::shared_ptr<DirectionalLight>& GetShadowMapLightSource();
+
 		ID3D11ShaderResourceView* GetShaderResourceView();
+		ID3D11ShaderResourceView** GetAddressOfShaderResourceView();
 
 	private:
 		void Initialize(std::shared_ptr<Direct3D>& direct3DRenderer);

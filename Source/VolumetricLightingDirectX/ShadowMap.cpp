@@ -63,9 +63,19 @@ namespace Rendering
 		}
 	}
 
+	std::shared_ptr<DirectionalLight>& ShadowMap::GetShadowMapLightSource()
+	{
+		return ShadowMapLight;
+	}
+
 	ID3D11ShaderResourceView* ShadowMap::GetShaderResourceView()
 	{
 		return ShadowMapResourceView.Get();
+	}
+
+	ID3D11ShaderResourceView ** ShadowMap::GetAddressOfShaderResourceView()
+	{
+		return ShadowMapResourceView.GetAddressOf();
 	}
 
 	void ShadowMap::Initialize(std::shared_ptr<Direct3D>& direct3DRenderer)

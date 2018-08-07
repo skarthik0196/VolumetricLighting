@@ -19,7 +19,7 @@ namespace Rendering
 			DirectX::XMFLOAT4X4 ProjectionMatrix;
 			DirectX::XMFLOAT2 NoiseScale;
 			float Radius{ 0.5f };
-			float Intensity{ 0.1f };
+			float Intensity{ 1.0f };
 			DirectX::XMFLOAT4 SSAOKernel[KernelSize];
 		};
 

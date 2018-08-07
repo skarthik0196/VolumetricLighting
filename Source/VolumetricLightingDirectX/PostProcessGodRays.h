@@ -31,10 +31,12 @@ namespace Rendering
 		void SetExposure(float exposure);
 		void SetDecay(float decay);
 		void SetWeight(float weight);
+		void EnableEffectState(bool state);
 
 		float GetExposure() const;
 		float GetDecay() const;
 		float GetWeight() const;
+		bool GetEnabledEffectState() const;
 
 		void CreateLightShafts(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 		void BlendLightShafts(std::shared_ptr<Direct3D>& direct3DRenderer);
@@ -56,5 +58,6 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GodRayResourceView;
 
 		bool CBufferNeedsUpdate{ true };
+		bool EnableEffect{ false };
 	};
 }

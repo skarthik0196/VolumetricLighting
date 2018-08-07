@@ -37,15 +37,29 @@ namespace Rendering
 	private:
 		void CreateVolumetrics(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 		void BlendVolumetrics(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
+		void BlurVolumetrics(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 		void Initialize(std::shared_ptr<Direct3D>& direct3DRenderer);
 
 		VolumetricLightPixelData PSData;
 		std::shared_ptr<ShadowMap> SMap;
 		std::shared_ptr<Shader> RenderTexturePixelShader;
+		std::shared_ptr<Shader> BlurXShader;
+		std::shared_ptr<Shader> BlurYShader;
+
 		Microsoft::WRL::ComPtr<ID3D11Buffer> PSCBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> VolumetricLightRenderTarget;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> VolumetricLightResourceView;
+
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> BlurXRenderTarget;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> BlurXResourceView;
+
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> BlurYRenderTarget;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> BlurYResourceView;
+
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> VolumetricLightTexture;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> BlurXTexture;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> BlurYTexture;
+
 		D3D11_VIEWPORT VolumtericLightViewPort;
 	};
 }

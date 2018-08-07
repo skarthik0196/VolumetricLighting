@@ -83,7 +83,7 @@ namespace Rendering
 
 	ID3D11ShaderResourceView* SSAO::GetFinalSSAOTextureResource() const
 	{
-		return SSAOTextureResource.Get();
+		return SSAOBlurResource.Get();
 	}
 
 	ID3D11ShaderResourceView** SSAO::GetAddressOfFinalSSAOTextureResource()

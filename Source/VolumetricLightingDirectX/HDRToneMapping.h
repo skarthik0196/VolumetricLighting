@@ -20,7 +20,7 @@ namespace Rendering
 
 		virtual void ApplyPostProcessing(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer);
 
-		void ToggleGammaCorrection();
+		void ToggleSSAO();
 		void ToggleHDR();
 		
 		bool IsHDR() const;

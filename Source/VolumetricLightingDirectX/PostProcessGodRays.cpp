@@ -35,6 +35,11 @@ namespace Rendering
 		CBufferNeedsUpdate = true;
 	}
 
+	void PostProcessGodRays::EnableEffectState(bool state)
+	{
+		EnableEffect = state;
+	}
+
 	float PostProcessGodRays::GetExposure() const
 	{
 		return PSData.Exposure;
@@ -48,6 +53,11 @@ namespace Rendering
 	float PostProcessGodRays::GetWeight() const
 	{
 		return PSData.Weight;
+	}
+
+	bool PostProcessGodRays::GetEnabledEffectState() const
+	{
+		return EnableEffect;
 	}
 
 	void PostProcessGodRays::CreateLightShafts(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer)
@@ -92,8 +102,11 @@ namespace Rendering
 
 	void PostProcessGodRays::ApplyPostProcessing(Scene * scene, std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
-		CreateLightShafts(scene, direct3DRenderer);
-		BlendLightShafts(direct3DRenderer);
+		if (EnableEffect)
+		{
+			CreateLightShafts(scene, direct3DRenderer);
+			BlendLightShafts(direct3DRenderer);
+		}
 	}
 
 	void PostProcessGodRays::Initialize(std::shared_ptr<Direct3D>& direct3DRenderer)

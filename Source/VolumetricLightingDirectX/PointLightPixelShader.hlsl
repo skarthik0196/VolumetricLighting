@@ -75,11 +75,8 @@ float4 main(VS_OUTPUT Input) : SV_TARGET
 
 	//float3 LightDirection = (PointLightPosition.xyz - WorldPosition);
 	//float Attenuation = saturate(1.0f - (length(LightDirection) / Radius));
-
 	//float NormalDotDirection = dot(Normal, normalize(LightDirection));
-
 	//float4 LightCoefficients = lit(NormalDotDirection, 0, 128);
-
 
 	//OutputColor.rgb = Color.rgb * PointLightColor.rgb * LightCoefficients.y * Attenuation;
 	//OutputColor.a = 1.0f;
@@ -101,7 +98,7 @@ float4 main(VS_OUTPUT Input) : SV_TARGET
 
 	float3 WorldPosition = (PositionTexture.Sample(Sampler, TextureCoord)).xyz;
 
-	float3 F0 = (float3)0.04;
+	float3 F0 = 0.04.xxx;
 	F0 = lerp(F0, Albedo, Metallic);
 
 	float3 NNormal = normalize(Normal);
@@ -110,7 +107,12 @@ float4 main(VS_OUTPUT Input) : SV_TARGET
 	float3 LightDirection = normalize(PointLightPosition.xyz - WorldPosition);
 	float3 HalfVector = normalize(ViewDirection + LightDirection);
 	float Distance = length(PointLightPosition.xyz - WorldPosition);
-	float Attenuation = saturate(1.0f - ((Distance*Distance) / (Radius*Radius)));  // 1.0f / (Distance * Distance); 
+
+	//float Attenuation = saturate(1.0f - ((Distance*Distance) / (Radius*Radius)));  // 1.0f / (Distance * Distance); 
+	float AttenuationNumerator = pow(saturate(1 - pow((Distance / Radius), 4)), 2);
+	float AttenuationDenominator = (Distance * Distance) + 1;
+	float Attenuation = AttenuationNumerator / AttenuationDenominator;
+
 	float3 Radiance = PointLightColor.rgb * Attenuation;
 
 	float3 F = FresnelSchlick(max(dot(HalfVector, ViewDirection), 0.0f), F0);

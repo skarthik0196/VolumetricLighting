@@ -218,6 +218,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ScreenQuad.h" />
+    <ClInclude Include="ScreenSpaceReflections.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="SkyBox.h" />
@@ -260,6 +261,7 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="ScreenQuad.cpp" />
+    <ClCompile Include="ScreenSpaceReflections.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="SkyBox.cpp" />
@@ -500,6 +502,12 @@ Xcopy  /e /y  "$(SolutionDir)..\External\Content" "$(OutDir)Content"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="SSRPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="VolumetricLightPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

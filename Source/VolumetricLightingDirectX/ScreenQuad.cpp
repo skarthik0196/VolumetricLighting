@@ -34,17 +34,17 @@ namespace Rendering
 		uint32_t stride = sizeof(Vertex);
 		uint32_t offset = 0;
 
-		deviceContext->IASetVertexBuffers(0, 1, VertexBuffer.GetAddressOf(), &stride, &offset);
+		deviceContext->IASetVertexBuffers(0, 0, nullptr, &stride, &offset);
 		deviceContext->VSSetShader(ScreenQuadVS->GetVertexShader(), 0, 0);
 
-		deviceContext->IASetInputLayout(ScreenQuadVS->GetInputLayout());		//Change to NULL if creating Quad in VS
+		deviceContext->IASetInputLayout(nullptr);		//Change to NULL if creating Quad in VS
 		deviceContext->IASetIndexBuffer(NULL, DXGI_FORMAT_R32_UINT, 0);
 
 	}
 
 	void ScreenQuad::DrawScreenQuad(ID3D11DeviceContext2 * deviceContext)
 	{
-		deviceContext->Draw(6, 0);
+		deviceContext->Draw(4, 0);
 
 	}
 }

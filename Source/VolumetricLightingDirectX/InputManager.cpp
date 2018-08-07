@@ -157,11 +157,11 @@ namespace Rendering
 
 		if (kb.D3)
 		{
-			KeyPressMap[InputActions::ToggleGammaCorrection] = true;
+			KeyPressMap[InputActions::ToggleSSAO] = true;
 		}
 		else
 		{
-			KeyPressMap[InputActions::ToggleGammaCorrection] = false;
+			KeyPressMap[InputActions::ToggleSSAO] = false;
 		}
 
 		if (kb.G)

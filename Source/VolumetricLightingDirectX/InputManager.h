@@ -25,7 +25,7 @@ namespace Rendering
 			RotateDirectionalLightUpDecrease,
 			ToggleFXAA,
 			ToggleHDR,
-			ToggleGammaCorrection,
+			ToggleSSAO,
 			Reset
 		};
 

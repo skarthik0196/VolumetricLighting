@@ -21,6 +21,7 @@ namespace Rendering
 	void VolumetricLight::ApplyPostProcessing(Scene* scene, std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
 		CreateVolumetrics(scene, direct3DRenderer);
+		BlurVolumetrics(scene, direct3DRenderer);
 		BlendVolumetrics(scene, direct3DRenderer);
 	}
 
@@ -100,9 +101,32 @@ namespace Rendering
 
 	}
 
+	void VolumetricLight::BlurVolumetrics(Scene * scene, std::shared_ptr<Direct3D>& direct3DRenderer)
+	{
+		scene;
+		direct3DRenderer;
+		ID3D11DeviceContext2* deviceContext = direct3DRenderer->GetDeviceContext();
+
+		deviceContext->PSSetShader(BlurXShader->GetPixelShader(), nullptr, 0);
+		deviceContext->OMSetRenderTargets(1, BlurXRenderTarget.GetAddressOf(), nullptr);
+		deviceContext->PSSetShaderResources(0, 1, VolumetricLightResourceView.GetAddressOf());
+
+		ScreenQuadData->DrawScreenQuad(deviceContext);
+		//deviceContext->ClearRenderTargetView(VolumetricLightRenderTarget.Get(), reinterpret_cast<float*>(&Utility::BackgroundColor));
+
+		deviceContext->PSSetShader(BlurYShader->GetPixelShader(), nullptr, 0);
+		deviceContext->OMSetRenderTargets(1, BlurYRenderTarget.GetAddressOf(), nullptr);
+		deviceContext->PSSetShaderResources(0, 1, BlurXResourceView.GetAddressOf());
+
+		ScreenQuadData->DrawScreenQuad(deviceContext);
+	}
+
 	void VolumetricLight::Initialize(std::shared_ptr<Direct3D>& direct3DRenderer)
 	{
-		ID3D11Device* device = direct3DRenderer->GetDevice();
+		ID3D11Device2* device = direct3DRenderer->GetDevice();
+		
+		BlurXShader = std::make_shared<Shader>(L"BlurXPixelShader.cso", Shader::ShaderType::PixelShader, device);
+		BlurYShader = std::make_shared<Shader>(L"BlurYPixelShader.cso", Shader::ShaderType::PixelShader, device);
 
 		D3D11_TEXTURE2D_DESC textureDescription;
 		ZeroMemory(&textureDescription, sizeof(D3D11_TEXTURE2D_DESC));
@@ -118,6 +142,8 @@ namespace Rendering
 		textureDescription.SampleDesc.Quality = direct3DRenderer->GetMultiSamplingQualityLevels() - 1;
 
 		device->CreateTexture2D(&textureDescription, nullptr, VolumetricLightTexture.ReleaseAndGetAddressOf());
+		device->CreateTexture2D(&textureDescription, nullptr, BlurXTexture.ReleaseAndGetAddressOf());
+		device->CreateTexture2D(&textureDescription, nullptr, BlurYTexture.ReleaseAndGetAddressOf());
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC resourceDescription;
 		ZeroMemory(&resourceDescription, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -128,6 +154,8 @@ namespace Rendering
 		resourceDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
 		device->CreateShaderResourceView(VolumetricLightTexture.Get(), &resourceDescription, VolumetricLightResourceView.ReleaseAndGetAddressOf());
+		device->CreateShaderResourceView(BlurXTexture.Get(), &resourceDescription, BlurXResourceView.ReleaseAndGetAddressOf());
+		device->CreateShaderResourceView(BlurYTexture.Get(), &resourceDescription, BlurYResourceView.ReleaseAndGetAddressOf());
 
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetDescription;
 		ZeroMemory(&renderTargetDescription, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
@@ -137,6 +165,9 @@ namespace Rendering
 		renderTargetDescription.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
 		device->CreateRenderTargetView(VolumetricLightTexture.Get(), &renderTargetDescription, VolumetricLightRenderTarget.ReleaseAndGetAddressOf());
+		device->CreateRenderTargetView(BlurXTexture.Get(), &renderTargetDescription, BlurXRenderTarget.ReleaseAndGetAddressOf());
+		device->CreateRenderTargetView(BlurYTexture.Get(), &renderTargetDescription, BlurYRenderTarget.ReleaseAndGetAddressOf());
+
 
 		D3D11_BUFFER_DESC bufferDescription;
 		ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));

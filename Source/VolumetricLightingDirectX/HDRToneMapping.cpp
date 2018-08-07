@@ -36,7 +36,7 @@ namespace  Rendering
 
 	}
 
-	void HDRToneMapping::ToggleGammaCorrection()
+	void HDRToneMapping::ToggleSSAO()
 	{
 		ApplyGammaCorrection = !ApplyGammaCorrection;
 		UpdateBuffer = true;

@@ -117,6 +117,7 @@
     <ClInclude Include="VolumetricLight.h">
       <Filter>PostProcessing</Filter>
     </ClInclude>
+    <ClInclude Include="ScreenSpaceReflections.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -209,6 +210,7 @@
     <ClCompile Include="VolumetricLight.cpp">
       <Filter>PostProcessing</Filter>
     </ClCompile>
+    <ClCompile Include="ScreenSpaceReflections.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VolumetricLightingDirectX.rc">
@@ -297,7 +299,12 @@
     <FxCompile Include="VolumetricLightPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="BlurXPixelShader.hlsl" />
-    <FxCompile Include="BlurYPixelShader.hlsl" />
+    <FxCompile Include="BlurXPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="BlurYPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SSRPixelShader.hlsl" />
   </ItemGroup>
 </Project>

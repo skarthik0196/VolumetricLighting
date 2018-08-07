@@ -1,4 +1,4 @@
-SamplerState Sampler;
+SamplerState Sampler : register(s2); //Point Sampler
 Texture2D SSAOTexture;
 
 struct VS_OUTPUT

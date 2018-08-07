@@ -114,17 +114,22 @@ namespace Rendering
 		//Lights->GetDirectionalLight()->ApplyRotation(Utility::Up, 180.0f);
 
 		auto PLight = Lights->CreatePointLight(DirectX::XMFLOAT3(0.0f, 30.0f, 50.0f), Utility::Red, 3.0f, 250.0f);
-		PLight->SetIntensity(4.0f);
+		PLight->SetIntensity(1700.0f);
 
-		/*std::uniform_real_distribution<float> distribution(-250.0f, 250.0f);
+		auto PLight2 = Lights->CreatePointLight(DirectX::XMFLOAT3(275.0f, 150.0f, -300.0f), Utility::Blue, 25000.0f, 350.0f);
+
+		std::uniform_real_distribution<float> zDistribution(-750.0f, -300.0f);
+		std::uniform_real_distribution<float> yDistribution(30.0f, 100.0f);
+
+
 		std::uniform_real_distribution<float> colordistribution(0, 1);
-		std::uniform_real_distribution<float> intensityDistribution(1.0f, 5.0f);
+		std::uniform_real_distribution<float> intensityDistribution(2500.0f, 7500.0f);
 		std::default_random_engine randomengine;
 
 		for (uint32_t i = 0; i < 40; ++i)
 		{
-			Lights->CreatePointLight(DirectX::XMFLOAT3((-750.0f + i*50.0f), distribution(randomengine), distribution(randomengine)), DirectX::XMFLOAT4(colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine)), intensityDistribution(randomengine), 300.0f);
-		}*/
+			Lights->CreatePointLight(DirectX::XMFLOAT3((-750.0f + i*50.0f), yDistribution(randomengine), zDistribution(randomengine)), DirectX::XMFLOAT4(colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine), colordistribution(randomengine)), intensityDistribution(randomengine), 300.0f);
+		}
 
 		Lights->GetDirectionalLight()->SetSourcePosition(DirectX::XMFLOAT3(0.0f, 500.0f, 0.0f));
 		Lights->GetDirectionalLight()->SetSourceScale(DirectX::XMFLOAT3(20.0f, 20.0f, 20.0f));
@@ -245,7 +250,7 @@ namespace Rendering
 			
 			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() +10.0f);
 
-			auto& dLight = Lights->GetDirectionalLight();
+			//auto& dLight = Lights->GetDirectionalLight();
 			//auto& sourcePosition = dLight->GetSourcePosition();
 
 			//dLight->SetSourcePosition(DirectX::XMFLOAT3(sourcePosition.x , sourcePosition.y , sourcePosition.z + 10.0f));
@@ -254,9 +259,11 @@ namespace Rendering
 
 			//Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, 0.2f);
 
-			dLight->SetIntensity(dLight->GetIntensity() + 1.0f);
+			//dLight->SetIntensity(dLight->GetIntensity() + 1.0f);
 
-			SSAOPostProcess->SetRadius(SSAOPostProcess->GetRadius() + 0.01f);
+			//SSAOPostProcess->SetRadius(SSAOPostProcess->GetRadius() + 0.01f);
+
+			SSAOPostProcess->SetIntensity(1.0f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::DecreaseAttribute))
@@ -267,7 +274,7 @@ namespace Rendering
 
 			//MainCamera->SetNearPlane(MainCamera->GetNearPlane() - 10.0f);
 
-			auto& dLight = Lights->GetDirectionalLight();
+			//auto& dLight = Lights->GetDirectionalLight();
 			//auto& sourcePosition = dLight->GetSourcePosition();
 
 			//dLight->SetSourcePosition(DirectX::XMFLOAT3(sourcePosition.x , sourcePosition.y , sourcePosition.z - 10.0f));
@@ -276,9 +283,11 @@ namespace Rendering
 
 			//Lights->GetDirectionalLight()->ApplyRotation(Utility::Right, -0.2f);
 
-			dLight->SetIntensity(dLight->GetIntensity() - 1.0f);
+			//dLight->SetIntensity(dLight->GetIntensity() - 1.0f);
 
-			SSAOPostProcess->SetRadius(SSAOPostProcess->GetRadius() - 0.01f);
+			//SSAOPostProcess->SetRadius(SSAOPostProcess->GetRadius() - 0.01f);
+
+			SSAOPostProcess->SetIntensity(0.0f);
 		}
 
 		if (inputMap.at(InputManager::InputActions::RotateDirectionalLightRightIncrease))
@@ -311,9 +320,12 @@ namespace Rendering
 			std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front())->ToggleHDR();
 		}
 
-		if (inputMap.at(InputManager::InputActions::ToggleGammaCorrection))
+		if (inputMap.at(InputManager::InputActions::ToggleSSAO))
 		{
-			std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front())->ToggleGammaCorrection();
+			//std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front())->ToggleGammaCorrection();
+			//SSAOPostProcess->SetIntensity(1.0f - SSAOPostProcess->GetIntensity());
+
+			dynamic_cast<PostProcessGodRays&>(*PostProcessList[2]).EnableEffectState(1 - static_cast<uint32_t>(dynamic_cast<PostProcessGodRays&>(*PostProcessList[2]).GetEnabledEffectState()));
 		}
 
 		if (inputMap.at(InputManager::InputActions::IncreaseExposure))
@@ -339,8 +351,8 @@ namespace Rendering
 		if (inputMap.at(InputManager::InputActions::Reset))
 		{
 			MainCamera->ResetCamera();
-			auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
-			hdr->SetExposure(1.0f);
+			//auto hdr = std::dynamic_pointer_cast<HDRToneMapping>(PostProcessList.front());
+			//hdr->SetExposure(1.0f);
 		}
 
 		auto currentRotation = MainCamera->GetRotationAsFloat3();
@@ -375,17 +387,17 @@ namespace Rendering
 	{
 
 		std::shared_ptr<HDRToneMapping> HDR = std::make_shared<HDRToneMapping>(device, ScreenQuad1);
-		HDR->ToggleGammaCorrection();
+		HDR->ToggleSSAO();
 		HDR->ToggleHDR();
 		PostProcessList.push_back(HDR);
-
-		//std::shared_ptr<PostProcessGodRays> LightShafts = std::make_shared<PostProcessGodRays>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"PostProcessLightShaftsPixelShader.cso", Lights->GetDirectionalLight());
-		//PostProcessList.push_back(LightShafts);
-		//LightShafts->SetExposure(0.0f);
 
 		std::shared_ptr<VolumetricLight> VLight = std::make_shared<VolumetricLight>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"VolumetricLightPixelShader.cso");
 		VLight->SetShadowMap(Lights->GetDirectionalLightShadowMap());
 		PostProcessList.push_back(VLight);
+
+		std::shared_ptr<PostProcessGodRays> LightShafts = std::make_shared<PostProcessGodRays>(SceneManagerReference.GetRenderer(), ScreenQuad1, L"PostProcessLightShaftsPixelShader.cso", Lights->GetDirectionalLight());
+		PostProcessList.push_back(LightShafts);
+		LightShafts->SetExposure(0.001f);
 
 		std::shared_ptr<FXAA> PostProcessFXAA = std::make_shared<FXAA>(device, ScreenQuad1);
 		PostProcessFXAA->SetScreenResolution(SceneManagerReference.GetRenderer()->GetScreenWidth(), SceneManagerReference.GetRenderer()->GetScreenHeight());;
@@ -431,8 +443,8 @@ namespace Rendering
 		}
 		SceneManagerReference.EndQuery(SceneManager::QueryTypes::GeometryPass);
 
-		/*GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
-		Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);*/
+		GBuffer1->SetRenderTarget(GBuffer::GBufferData::OcclusionMap, direct3DRenderer);
+		Lights->RenderDirectionalLightSourceToScreen(this, direct3DRenderer, viewProjectionMatrix);
 
 		SceneManagerReference.BeginQuery(SceneManager::QueryTypes::SSAO);
 		SSAOPostProcess->ApplyPostProcessing(this, direct3DRenderer);
@@ -479,7 +491,7 @@ namespace Rendering
 
 		direct3DRenderer->EnableDepthTesting();
 
-		SceneManagerReference.RenderQueryData();
+		SceneManagerReference.RenderQueryData();	
 	}
 
 	void Scene::AddGameObject(std::shared_ptr<GameObject> gameObject)
